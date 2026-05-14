@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Treinamento de Uso - Lubit Sign-off</title>
+    <style>
+      body {
+        margin: 0;
+        background: #f6f8fb;
+        color: #1d252c;
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 1.55;
+      }
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+      article {
+        background: #fff;
+        border: 1px solid #d8e0e7;
+        border-radius: 10px;
+        padding: 28px;
+        box-shadow: 0 2px 10px rgba(30, 43, 54, 0.06);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+      h2 {
+        margin-top: 28px;
+        padding-top: 18px;
+        border-top: 1px solid #d8e0e7;
+        font-size: 20px;
+      }
+      h3 {
+        margin-bottom: 6px;
+        color: #176b62;
+      }
+      code {
+        background: #eef2f5;
+        border-radius: 6px;
+        padding: 2px 5px;
+      }
+      .lead {
+        color: #65727e;
+        font-size: 16px;
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .step {
+        border-left: 4px solid #176b62;
+        background: #fbfcfd;
+        border-radius: 8px;
+        padding: 12px;
+      }
+      @media (max-width: 760px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media print {
+        body {
+          background: #fff;
+        }
+        article {
+          box-shadow: none;
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>Treinamento de Uso - Lubit Sign-off</h1>
+        <p class="lead">Ferramenta para validar a entrega do sistema, registrar evidências, controlar pendências e gerar o pacote final de aceite.</p>
+
+        <h2>Jornada Recomendada</h2>
+        <div class="steps">
+          <section class="step">
+            <h3>1. Preparar a entrega</h3>
+            <p>Valide ambiente, usuários, permissões, cadastros, plano migrado e árvore de ativos.</p>
+          </section>
+          <section class="step">
+            <h3>2. Validar a operação</h3>
+            <p>Execute tarefas CIT, geração de OS, retorno, OS extraordinária, nota técnica, parada preventiva e estoque.</p>
+          </section>
+          <section class="step">
+            <h3>3. Assinar o aceite</h3>
+            <p>Revise importações, SAP, relatórios, logs, mapas, pendências e assinaturas.</p>
+          </section>
+        </div>
+
+        <h2>Status dos Cenários</h2>
+        <ul>
+          <li><strong>Não iniciado:</strong> ainda não testado.</li>
+          <li><strong>Em teste:</strong> execução em andamento.</li>
+          <li><strong>Aprovado:</strong> validado com evidência suficiente.</li>
+          <li><strong>Reprovado:</strong> comportamento incorreto encontrado.</li>
+          <li><strong>Bloqueado:</strong> não foi possível testar por dependência externa.</li>
+          <li><strong>N/A:</strong> não aplicável ao projeto.</li>
+        </ul>
+
+        <h2>Como Registrar Um Teste</h2>
+        <ol>
+          <li>Abra <strong>Jornada</strong> ou <strong>Kanban</strong>.</li>
+          <li>Clique em um cenário.</li>
+          <li>Leia objetivo, passos e resultado esperado.</li>
+          <li>Preencha responsável, data e evidência.</li>
+          <li>Altere o status.</li>
+          <li>Se houver problema, preencha o campo de pendência.</li>
+        </ol>
+
+        <h2>Kanban</h2>
+        <p>A aba <strong>Kanban</strong> mostra rapidamente o que ainda não começou, o que está em teste, o que foi aprovado, o que tem pendência e o que é N/A.</p>
+
+        <h2>Pendências</h2>
+        <p>A aba <strong>Pendências</strong> reúne automaticamente cenários reprovados, bloqueados ou com descrição de defeito. Antes do sign-off final, revise essa tela e decida se o item será corrigido, aceito com ressalva, marcado como N/A ou mantido como bloqueio.</p>
+
+        <h2>Relatório e Assinaturas</h2>
+        <ol>
+          <li>Revise o progresso do pacote.</li>
+          <li>Adicione assinaturas por área.</li>
+          <li>Gere o relatório HTML.</li>
+          <li>Exporte Markdown se precisar de versão editável.</li>
+          <li>Exporte JSON para backup e continuidade do aceite.</li>
+        </ol>
+
+        <h2>Exportar e Importar JSON</h2>
+        <p>O app salva dados no navegador. Use <strong>Exportar JSON</strong> ao final de cada sessão e <strong>Importar JSON</strong> para continuar em outro navegador ou computador.</p>
+
+        <h2>Boas Práticas</h2>
+        <ul>
+          <li>Não aprove cenário sem evidência.</li>
+          <li>Use comentários curtos e objetivos.</li>
+          <li>Mantenha uma assinatura por área participante.</li>
+          <li>Exporte o JSON antes de limpar o preenchimento.</li>
+          <li>Gere o relatório final somente após revisar pendências.</li>
+        </ul>
+      </article>
+    </main>
+  </body>
+</html>

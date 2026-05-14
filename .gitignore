@@ -3,3 +3,6 @@ Thumbs.db
 .vercel/
 node_modules/
 *.log
+artifacts/
+playwright-report/
+test-results/

@@ -5,12 +5,19 @@
   "description": "Aplicação estática para sign-off de implantação do Lubit.",
   "scripts": {
     "start": "npx serve .",
-    "check": "node --check app.js"
+    "check": "node --check app.js",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "keywords": [
     "signoff",
     "acceptance",
     "lubit"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "http-server": "^14.1.1"
+  }
 }
