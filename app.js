@@ -720,6 +720,36 @@ const processProfiles = {
   },
 };
 
+const processGroups = [
+  {
+    id: "dados",
+    title: "Preparar a entrega",
+    shortTitle: "Dados iniciais",
+    icon: "boxes",
+    color: "teal",
+    processIds: ["implantacao", "cadastros"],
+    objective: "Ambiente, usuários, cadastros, plano e estrutura prontos para testar.",
+  },
+  {
+    id: "operacao",
+    title: "Validar a operação",
+    shortTitle: "Operação principal",
+    icon: "wrench",
+    color: "blue",
+    processIds: ["operacionais"],
+    objective: "Plano, tarefas, geração de OS, retorno, extraordinária, notas e estoque funcionando.",
+  },
+  {
+    id: "apoio",
+    title: "Assinar o aceite",
+    shortTitle: "Apoio e integrações",
+    icon: "plug",
+    color: "violet",
+    processIds: ["integracoes", "consultas"],
+    objective: "Importações, SAP, relatórios, logs, mapas e pendências fechados para assinatura.",
+  },
+];
+
 let state = loadState();
 let selectedScenarioId = getAllScenarios()[0].scenario.id;
 
@@ -730,16 +760,11 @@ const els = {
   processFilter: document.getElementById("processFilter"),
   statusFilter: document.getElementById("statusFilter"),
   searchFilter: document.getElementById("searchFilter"),
-  summaryGrid: document.getElementById("summaryGrid"),
-  dashboardGates: document.getElementById("dashboardGates"),
-  processProgress: document.getElementById("processProgress"),
-  methodology: document.getElementById("methodology"),
-  processMatrix: document.getElementById("processMatrix"),
-  matrixCount: document.getElementById("matrixCount"),
-  checklist: document.getElementById("checklist"),
-  scenarioCount: document.getElementById("scenarioCount"),
-  scenarioList: document.getElementById("scenarioList"),
-  scenarioDetail: document.getElementById("scenarioDetail"),
+  journeySummary: document.getElementById("journeySummary"),
+  journeySteps: document.getElementById("journeySteps"),
+  journeyDetail: document.getElementById("journeyDetail"),
+  kanbanBoard: document.getElementById("kanbanBoard"),
+  reportSummary: document.getElementById("reportSummary"),
   issuesList: document.getElementById("issuesList"),
   signaturesList: document.getElementById("signaturesList"),
   importFile: document.getElementById("importFile"),
@@ -846,12 +871,10 @@ function percent(part, total) {
 function render() {
   bindProjectFields();
   renderFilters();
-  renderDashboard();
-  renderMethodology();
-  renderProcessMatrix();
-  renderChecklist();
-  renderExecution();
+  renderJourney();
+  renderKanban();
   renderIssues();
+  renderReport();
   renderSignatures();
 }
 
@@ -876,6 +899,240 @@ function renderFilters() {
     ...statuses.map((status) => `<option value="${status}">${status}</option>`),
   ].join("");
   els.statusFilter.value = currentStatus;
+}
+
+function renderJourney() {
+  const all = getAllScenarios();
+  const completed = all.filter(({ scenario }) =>
+    ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+  ).length;
+  const approved = all.filter(({ scenario }) => state.scenarios[scenario.id].status === "Aprovado").length;
+  const issues = all.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length;
+  const progress = percent(completed, all.length);
+
+  els.journeySummary.innerHTML = [
+    metricCard("check", `${progress}%`, "Progresso"),
+    metricCard("shield", approved, "Aprovados"),
+    metricCard("alert", issues, "Pendências"),
+    metricCard("signature", state.signatures.length, "Assinaturas"),
+  ].join("");
+
+  els.journeySteps.innerHTML = processGroups.map(renderJourneyGroup).join("");
+  renderSimpleScenarioDetail();
+}
+
+function renderJourneyGroup(group) {
+  const scenarios = getAllScenarios().filter(({ process }) => group.processIds.includes(process.id));
+  const completed = scenarios.filter(({ scenario }) =>
+    ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+  ).length;
+  const groupIssues = scenarios.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length;
+  const next = scenarios.find(({ scenario }) => !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status));
+  const progress = percent(completed, scenarios.length);
+
+  return `
+    <article class="journey-card ${group.color}">
+      <div class="journey-icon">${renderIcon(group.icon)}</div>
+      <div class="journey-card-body">
+        <div class="journey-card-header">
+          <div>
+            <p class="eyebrow">${group.shortTitle}</p>
+            <h3>${group.title}</h3>
+          </div>
+          <strong>${progress}%</strong>
+        </div>
+        <p>${group.objective}</p>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+        <div class="journey-card-footer">
+          <span>${completed}/${scenarios.length} concluídos</span>
+          <span>${groupIssues} pendência(s)</span>
+          ${
+            next
+              ? `<button type="button" class="ghost-button compact-button" data-select-scenario="${next.scenario.id}">Continuar</button>`
+              : `<span class="done-label">Bloco concluído</span>`
+          }
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderKanban() {
+  const columns = [
+    { id: "todo", title: "Não iniciado", icon: "circle", match: (data) => data.status === "Não iniciado" },
+    { id: "testing", title: "Em teste", icon: "timer", match: (data) => data.status === "Em teste" },
+    { id: "done", title: "Aprovado", icon: "check", match: (data) => data.status === "Aprovado" },
+    { id: "issue", title: "Pendência", icon: "alert", match: (data) => ["Reprovado", "Bloqueado"].includes(data.status) || Boolean(data.issues.trim()) },
+    { id: "na", title: "N/A", icon: "minus", match: (data) => data.status === "N/A" },
+  ];
+  const filtered = getFilteredScenarios();
+
+  els.kanbanBoard.innerHTML = columns
+    .map((column) => {
+      const cards = filtered.filter(({ scenario }) => column.match(state.scenarios[scenario.id]));
+      return `
+        <section class="kanban-column ${column.id}">
+          <header>
+            <span>${renderIcon(column.icon)}</span>
+            <strong>${column.title}</strong>
+            <em>${cards.length}</em>
+          </header>
+          <div class="kanban-cards">
+            ${
+              cards
+                .map(({ process, feature, scenario }) => {
+                  const data = state.scenarios[scenario.id];
+                  const group = getProcessGroup(process.id);
+                  return `
+                    <button type="button" class="kanban-card ${group.color}" data-select-scenario="${scenario.id}">
+                      <span class="kanban-tag">${renderIcon(group.icon)} ${group.shortTitle}</span>
+                      <strong>${scenario.name}</strong>
+                      <small>${feature.name}</small>
+                      <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
+                    </button>
+                  `;
+                })
+                .join("") || `<p class="empty-column">Sem itens</p>`
+            }
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function renderReport() {
+  const all = getAllScenarios();
+  const completed = all.filter(({ scenario }) =>
+    ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+  ).length;
+  const issues = all.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length;
+  const progress = percent(completed, all.length);
+  const signatureStatus = state.signatures.length ? "Aceite com assinatura registrada" : "Aguardando assinatura";
+
+  els.reportSummary.innerHTML = `
+    <article class="report-card">
+      <div class="report-icon">${renderIcon("file")}</div>
+      <div>
+        <p class="eyebrow">Pacote de aceite</p>
+        <h3>${progress}% concluído</h3>
+        <p>${completed}/${all.length} cenários finalizados, ${issues} pendência(s), ${signatureStatus.toLowerCase()}.</p>
+      </div>
+    </article>
+    <div class="report-actions">
+      <button type="button" class="wide-button" id="reportBtnInline">Gerar relatório HTML</button>
+      <button type="button" class="wide-button" id="markdownBtnInline">Exportar Markdown</button>
+      <button type="button" class="ghost-button" id="exportBtnInline">Exportar JSON</button>
+    </div>
+  `;
+
+  document.getElementById("reportBtnInline").addEventListener("click", generateReport);
+  document.getElementById("markdownBtnInline").addEventListener("click", exportMarkdown);
+  document.getElementById("exportBtnInline").addEventListener("click", exportJson);
+}
+
+function renderSimpleScenarioDetail() {
+  const selected = getAllScenarios().find((item) => item.scenario.id === selectedScenarioId);
+  if (!selected) {
+    els.journeyDetail.innerHTML = `<div class="empty-state">Selecione um cenário no Kanban ou na Jornada.</div>`;
+    return;
+  }
+
+  const data = state.scenarios[selected.scenario.id];
+  const meta = getScenarioMeta(selected.process, selected.feature, selected.scenario);
+  const group = getProcessGroup(selected.process.id);
+
+  els.journeyDetail.innerHTML = `
+    <article class="scenario-focus ${group.color}">
+      <div class="scenario-focus-header">
+        <span class="scenario-focus-icon">${renderIcon(group.icon)}</span>
+        <div>
+          <p class="eyebrow">${group.shortTitle} / ${selected.feature.name}</p>
+          <h2>${selected.scenario.name}</h2>
+        </div>
+        <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
+      </div>
+      <div class="focus-grid">
+        <section>
+          <h3>Objetivo</h3>
+          <p>${selected.scenario.acceptance}</p>
+        </section>
+        <section>
+          <h3>Resultado esperado</h3>
+          <p>${meta.expectedResult}</p>
+        </section>
+      </div>
+      <section>
+        <h3>Passos rápidos</h3>
+        <ol class="steps-list compact-list">
+          ${selected.scenario.steps.map((step) => `<li>${step}</li>`).join("")}
+        </ol>
+      </section>
+      <div class="detail-grid" data-scenario-form="${selected.scenario.id}">
+        <label>
+          Status
+          <select data-field="status">
+            ${statuses.map((status) => `<option value="${status}">${status}</option>`).join("")}
+          </select>
+        </label>
+        <label>
+          Responsável
+          <input data-field="owner" type="text">
+        </label>
+        <label>
+          Data
+          <input data-field="date" type="date">
+        </label>
+        <label class="full-width">
+          Evidência
+          <textarea data-field="evidence" rows="2" placeholder="Link, print, arquivo ou observação"></textarea>
+        </label>
+        <label class="full-width">
+          Pendência
+          <textarea data-field="issues" rows="2" placeholder="Descreva somente se houver bloqueio ou ressalva"></textarea>
+        </label>
+      </div>
+    </article>
+  `;
+
+  els.journeyDetail.querySelectorAll("[data-field]").forEach((field) => {
+    field.value = data[field.dataset.field] || "";
+  });
+}
+
+function metricCard(iconName, value, label) {
+  return `
+    <article class="summary-card metric-card">
+      <span>${renderIcon(iconName)}</span>
+      <div>
+        <strong>${value}</strong>
+        <small>${label}</small>
+      </div>
+    </article>
+  `;
+}
+
+function getProcessGroup(processId) {
+  return processGroups.find((group) => group.processIds.includes(processId)) || processGroups[0];
+}
+
+function renderIcon(name) {
+  const icons = {
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
+    alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    signature: '<path d="M3 21c3-5 6-5 9 0 3-5 6-5 9 0"/><path d="M7 13 17 3l4 4-10 10H7v-4Z"/>',
+    boxes: '<path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z"/><path d="M3 7.5v9L12 21v-9"/><path d="M21 7.5v9L12 21"/><path d="M12 12v9"/>',
+    wrench: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"/>',
+    plug: '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M7 8h10v4a5 5 0 0 1-10 0V8Z"/>',
+    circle: '<circle cx="12" cy="12" r="8"/>',
+    timer: '<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="13" r="8"/>',
+    minus: '<path d="M5 12h14"/>',
+    file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>',
+  };
+  return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || icons.circle}</svg>`;
 }
 
 function renderDashboard() {
@@ -1289,14 +1546,10 @@ function renderSignatures() {
 function updateScenario(id, field, value) {
   state.scenarios[id][field] = value;
   persist();
-  renderDashboard();
-  renderMethodology();
-  renderProcessMatrix();
-  renderChecklist();
+  renderJourney();
+  renderKanban();
   renderIssues();
-  if (field === "status") {
-    renderExecution();
-  }
+  renderReport();
 }
 
 function exportJson() {
@@ -1615,8 +1868,8 @@ document.body.addEventListener("click", (event) => {
   const scenarioButton = event.target.closest("[data-select-scenario]");
   if (scenarioButton) {
     selectedScenarioId = scenarioButton.dataset.selectScenario;
-    document.querySelector('[data-tab="execution"]').click();
-    renderExecution();
+    document.querySelector('[data-tab="journey"]').click();
+    renderJourney();
     return;
   }
 
@@ -1624,13 +1877,13 @@ document.body.addEventListener("click", (event) => {
     const index = Number(event.target.closest(".signature-card").dataset.signatureIndex);
     state.signatures.splice(index, 1);
     persist();
-    renderDashboard();
-    renderMethodology();
+    renderJourney();
+    renderReport();
     renderSignatures();
   }
 });
 
-els.scenarioDetail.addEventListener("input", (event) => {
+els.journeyDetail.addEventListener("change", (event) => {
   const field = event.target.closest("[data-field]");
   const form = event.target.closest("[data-scenario-form]");
   if (!field || !form) return;
@@ -1643,15 +1896,15 @@ els.signaturesList.addEventListener("input", (event) => {
   if (!field || !card) return;
   state.signatures[Number(card.dataset.signatureIndex)][field.dataset.field] = field.value;
   persist();
-  renderDashboard();
-  renderMethodology();
+  renderJourney();
+  renderReport();
 });
 
 document.getElementById("addSignatureBtn").addEventListener("click", () => {
   state.signatures.push({ area: "", name: "", role: "", date: "", notes: "" });
   persist();
-  renderDashboard();
-  renderMethodology();
+  renderJourney();
+  renderReport();
   renderSignatures();
 });
 

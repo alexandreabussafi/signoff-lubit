@@ -24,19 +24,18 @@ npx serve .
 
 ## Funcionalidades
 
-- Framework de aceite com fases, gates e matriz de aprovação.
-- Dashboard de progresso por macroprocesso.
-- Gates de aceite: ambiente/dados, cadastros, fluxos operacionais, integrações/relatórios e assinatura final.
-- Matriz de processos com macroprocesso, funcionalidade, criticidade, tipo, responsável sugerido, evidência esperada e status.
-- Checklist hierárquico de fluxos críticos.
-- Execução orientada em formato UAT com pré-condições, dados necessários, passos, resultado esperado, critério de aceite e registro de evidências.
+- Jornada simplificada em 3 blocos: dados iniciais, operação principal, apoio e integrações.
+- Visual mais leve, colorido e com ícones SVG.
+- Kanban por status para acompanhar a validação.
+- Dashboard reduzido com progresso, aprovados, pendências e assinaturas.
+- Execução rápida com objetivo, passos, resultado esperado, status, evidência e pendência.
 - Controle de status: `Não iniciado`, `Em teste`, `Aprovado`, `Reprovado`, `Bloqueado`, `N/A`.
 - Lista de pendências por severidade e responsável.
 - Assinaturas de aceite por área.
 - Persistência automática no navegador via `localStorage`.
 - Exportação/importação JSON.
 - Exportação Markdown formal.
-- Relatório HTML imprimível com resumo executivo, fases, gates, matriz, roteiro UAT, pendências/riscos e assinaturas.
+- Relatório HTML imprimível com resumo executivo, matriz formal, roteiro UAT, pendências/riscos e assinaturas.
 
 ## Dados e backup
 

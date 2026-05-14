@@ -64,87 +64,32 @@
 
       <section class="workspace">
         <nav class="tabs" aria-label="Seções do sign-off">
-          <button type="button" class="tab active" data-tab="dashboard">Dashboard</button>
-          <button type="button" class="tab" data-tab="methodology">Framework</button>
-          <button type="button" class="tab" data-tab="matrix">Matriz</button>
-          <button type="button" class="tab" data-tab="checklist">Checklist</button>
-          <button type="button" class="tab" data-tab="execution">Execução</button>
+          <button type="button" class="tab active" data-tab="journey">Jornada</button>
+          <button type="button" class="tab" data-tab="kanban">Kanban</button>
           <button type="button" class="tab" data-tab="issues">Pendências</button>
-          <button type="button" class="tab" data-tab="signatures">Assinaturas</button>
+          <button type="button" class="tab" data-tab="report">Relatório</button>
         </nav>
 
-        <section class="tab-panel active" id="dashboardPanel">
-          <div class="summary-grid" id="summaryGrid"></div>
-          <div class="progress-section">
-            <h2>Gates de aceite</h2>
-            <div class="gates-grid" id="dashboardGates"></div>
-          </div>
-          <div class="progress-section">
-            <h2>Progresso por macroprocesso</h2>
-            <div id="processProgress"></div>
-          </div>
-        </section>
-
-        <section class="tab-panel" id="methodologyPanel">
+        <section class="tab-panel active" id="journeyPanel">
           <div class="section-title-row">
             <div>
-              <h2>Framework de aceite</h2>
-              <p>Metodologia de entrega com fases, gates, evidências e sign-off final.</p>
+              <h2>Jornada de aceite</h2>
+              <p>Prepare a entrega, valide a operação e registre o aceite final.</p>
             </div>
           </div>
-          <div id="methodology"></div>
+          <div class="summary-grid compact" id="journeySummary"></div>
+          <div class="journey-steps" id="journeySteps"></div>
+          <div class="simple-detail" id="journeyDetail"></div>
         </section>
 
-        <section class="tab-panel" id="matrixPanel">
+        <section class="tab-panel" id="kanbanPanel">
           <div class="section-title-row">
             <div>
-              <h2>Matriz de processos</h2>
-              <p>Visão cruzada de processo, criticidade, tipo, responsável, evidência e status.</p>
-            </div>
-            <span class="muted" id="matrixCount"></span>
-          </div>
-          <div class="matrix-wrapper">
-            <table class="process-matrix">
-              <thead>
-                <tr>
-                  <th>Gate</th>
-                  <th>Macroprocesso</th>
-                  <th>Funcionalidade</th>
-                  <th>Cenário</th>
-                  <th>Tipo</th>
-                  <th>Criticidade</th>
-                  <th>Responsável sugerido</th>
-                  <th>Evidência esperada</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="processMatrix"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <section class="tab-panel" id="checklistPanel">
-          <div class="section-title-row">
-            <div>
-              <h2>Checklist funcional</h2>
-              <p>Mapa hierárquico de macroprocessos, funcionalidades e cenários de aceite.</p>
-            </div>
-            <span class="muted" id="scenarioCount"></span>
-          </div>
-          <div id="checklist"></div>
-        </section>
-
-        <section class="tab-panel" id="executionPanel">
-          <div class="section-title-row">
-            <div>
-              <h2>Execução orientada</h2>
-              <p>Selecione um cenário, execute os passos e registre o resultado.</p>
+              <h2>Kanban de validação</h2>
+              <p>Arraste mentalmente a entrega pelo status: comece pelos bloqueios e feche os aprovados.</p>
             </div>
           </div>
-          <div class="execution-layout">
-            <div class="scenario-list" id="scenarioList"></div>
-            <article class="scenario-detail" id="scenarioDetail"></article>
-          </div>
+          <div class="kanban-board" id="kanbanBoard"></div>
         </section>
 
         <section class="tab-panel" id="issuesPanel">
@@ -157,15 +102,18 @@
           <div id="issuesList"></div>
         </section>
 
-        <section class="tab-panel" id="signaturesPanel">
+        <section class="tab-panel" id="reportPanel">
           <div class="section-title-row">
             <div>
-              <h2>Assinaturas de aceite</h2>
-              <p>Registre o aceite por área responsável.</p>
+              <h2>Relatório e assinaturas</h2>
+              <p>Feche o pacote de evidências, gere o relatório e registre o aceite.</p>
             </div>
             <button type="button" class="primary-button" id="addSignatureBtn">Adicionar assinatura</button>
           </div>
-          <div id="signaturesList"></div>
+          <div class="report-grid">
+            <div id="reportSummary"></div>
+            <div id="signaturesList"></div>
+          </div>
         </section>
       </section>
     </main>
