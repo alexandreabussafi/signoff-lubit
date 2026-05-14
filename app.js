@@ -606,6 +606,120 @@ const catalog = [
   },
 ];
 
+const acceptanceGates = [
+  {
+    id: "gate-1",
+    name: "Gate 1",
+    title: "Ambiente e dados migrados",
+    phase: "Preparação",
+    processIds: ["implantacao"],
+    objective:
+      "Confirmar ambiente disponível, migrations aplicadas, usuários/unidades e dados mestres mínimos migrados.",
+  },
+  {
+    id: "gate-2",
+    name: "Gate 2",
+    title: "Cadastros críticos validados",
+    phase: "Migração e dados mestres",
+    processIds: ["cadastros"],
+    objective:
+      "Validar cadastros administrativos, operacionais, materiais e estrutura industrial usados pelos fluxos críticos.",
+  },
+  {
+    id: "gate-3",
+    name: "Gate 3",
+    title: "Fluxos operacionais aprovados",
+    phase: "Validação funcional",
+    processIds: ["operacionais"],
+    objective:
+      "Aprovar geração, consulta, retorno, OS extraordinária, notas, parada preventiva e estoque.",
+  },
+  {
+    id: "gate-4",
+    name: "Gate 4",
+    title: "Integrações e relatórios validados",
+    phase: "Operação assistida",
+    processIds: ["integracoes", "consultas"],
+    objective:
+      "Confirmar importações, SAP, logs, relatórios, gráficos, mapas e recursos de apoio.",
+  },
+  {
+    id: "gate-5",
+    name: "Gate 5",
+    title: "Assinatura final",
+    phase: "Sign-off final",
+    processIds: ["implantacao", "cadastros", "operacionais", "integracoes", "consultas"],
+    objective:
+      "Formalizar aceite com pendências conhecidas, riscos registrados e assinaturas das áreas responsáveis.",
+  },
+];
+
+const acceptancePhases = [
+  {
+    name: "Preparação",
+    description:
+      "Definir ambiente, escopo, responsáveis, dados de entrada e evidências mínimas para iniciar o aceite.",
+  },
+  {
+    name: "Migração e dados mestres",
+    description:
+      "Validar base técnica, usuários, unidades, plano de lubrificação, estrutura industrial e cadastros críticos.",
+  },
+  {
+    name: "Validação funcional",
+    description:
+      "Executar roteiros UAT dos fluxos transacionais que sustentam operação, retorno e gestão de OS.",
+  },
+  {
+    name: "Operação assistida",
+    description:
+      "Validar integrações, relatórios, logs e recursos de apoio com dados representativos da rotina.",
+  },
+  {
+    name: "Pendências",
+    description:
+      "Classificar defeitos, bloqueios, riscos e itens aceitos com ressalva antes da assinatura final.",
+  },
+  {
+    name: "Sign-off final",
+    description:
+      "Emitir relatório de aceite, consolidar evidências e registrar assinatura das áreas participantes.",
+  },
+];
+
+const processProfiles = {
+  implantacao: {
+    type: "Preparação",
+    criticality: "Crítica",
+    owner: "TI / Implantação",
+    evidence: "Prints de ambiente, logs de migration, amostra de dados migrados e checklist técnico.",
+  },
+  cadastros: {
+    type: "Cadastro",
+    criticality: "Alta",
+    owner: "Key user / Administração",
+    evidence: "Prints de cadastro, consulta, edição e amostra de registros validados.",
+  },
+  operacionais: {
+    type: "Transacional",
+    criticality: "Crítica",
+    owner: "Operação / Manutenção",
+    evidence: "Número de OS, prints do fluxo executado, PDF/relatório e histórico de retorno.",
+  },
+  integracoes: {
+    type: "Integração",
+    criticality: "Crítica",
+    owner: "TI / Integrações / SAP",
+    evidence: "Arquivo importado, protocolo/log, status SAP, documentos retornados e divergências tratadas.",
+  },
+  consultas: {
+    type: "Relatório / Apoio",
+    criticality: "Média",
+    owner: "Gestão / Operação",
+    evidence: "Prints de filtros, relatório gerado, dashboard ou mapa com período/unidade identificados.",
+  },
+};
+
 let state = loadState();
 let selectedScenarioId = getAllScenarios()[0].scenario.id;
 
@@ -617,7 +731,11 @@ const els = {
   statusFilter: document.getElementById("statusFilter"),
   searchFilter: document.getElementById("searchFilter"),
   summaryGrid: document.getElementById("summaryGrid"),
+  dashboardGates: document.getElementById("dashboardGates"),
   processProgress: document.getElementById("processProgress"),
+  methodology: document.getElementById("methodology"),
+  processMatrix: document.getElementById("processMatrix"),
+  matrixCount: document.getElementById("matrixCount"),
   checklist: document.getElementById("checklist"),
   scenarioCount: document.getElementById("scenarioCount"),
   scenarioList: document.getElementById("scenarioList"),
@@ -729,6 +847,8 @@ function render() {
   bindProjectFields();
   renderFilters();
   renderDashboard();
+  renderMethodology();
+  renderProcessMatrix();
   renderChecklist();
   renderExecution();
   renderIssues();
@@ -778,6 +898,8 @@ function renderDashboard() {
     summaryCard(openIssues, "Pendências"),
   ].join("");
 
+  els.dashboardGates.innerHTML = acceptanceGates.map(renderGateCard).join("");
+
   els.processProgress.innerHTML = catalog
     .map((process) => {
       const scenarios = getAllScenarios().filter((item) => item.process.id === process.id);
@@ -803,6 +925,144 @@ function summaryCard(value, label) {
   return `<article class="summary-card"><strong>${value}</strong><span>${label}</span></article>`;
 }
 
+function renderMethodology() {
+  const gatesHtml = acceptanceGates.map(renderGateCard).join("");
+  const phasesHtml = acceptancePhases
+    .map(
+      (phase, index) => `
+        <article class="phase-card">
+          <span class="phase-index">${index + 1}</span>
+          <div>
+            <h3>${phase.name}</h3>
+            <p>${phase.description}</p>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+
+  els.methodology.innerHTML = `
+    <section class="framework-section">
+      <h2>Fases do aceite</h2>
+      <div class="phase-grid">${phasesHtml}</div>
+    </section>
+    <section class="framework-section">
+      <h2>Gates de aprovação</h2>
+      <div class="gates-grid">${gatesHtml}</div>
+    </section>
+    <section class="framework-section">
+      <h2>Pacote de evidências</h2>
+      <div class="evidence-grid">
+        <article><strong>Obrigatório</strong><p>Status, responsável, data, ambiente e evidência para cenários aprovados.</p></article>
+        <article><strong>Pendência</strong><p>Descrição, severidade, responsável e evidência para reprovados ou bloqueados.</p></article>
+        <article><strong>Sign-off</strong><p>Assinaturas por área e relatório HTML/Markdown exportado ao final.</p></article>
+      </div>
+    </section>
+  `;
+}
+
+function renderProcessMatrix() {
+  const rows = getFilteredScenarios();
+  els.matrixCount.textContent = `${rows.length} cenário(s)`;
+  els.processMatrix.innerHTML = rows
+    .map(({ process, feature, scenario }) => {
+      const data = state.scenarios[scenario.id];
+      const meta = getScenarioMeta(process, feature, scenario);
+      return `
+        <tr>
+          <td>${meta.gate.name}</td>
+          <td>${process.name}</td>
+          <td>${feature.name}</td>
+          <td>
+            <strong>${scenario.name}</strong>
+            <span class="table-note">${scenario.acceptance}</span>
+          </td>
+          <td>${meta.type}</td>
+          <td>${meta.criticality}</td>
+          <td>${meta.owner}</td>
+          <td>${meta.evidence}</td>
+          <td><span class="status-pill ${statusClass(data.status)}">${data.status}</span></td>
+        </tr>
+      `;
+    })
+    .join("") || `<tr><td colspan="9">Nenhum cenário encontrado para os filtros atuais.</td></tr>`;
+}
+
+function renderGateCard(gate) {
+  const stats = getGateStats(gate);
+  const isFinalGate = gate.id === "gate-5";
+  const signatureReady = state.signatures.length > 0;
+  const gateReady = isFinalGate ? stats.progress === 100 && signatureReady : stats.progress === 100;
+  const statusText = gateReady ? "Aprovado" : stats.blocked ? "Bloqueado" : "Em validação";
+  return `
+    <article class="gate-card ${gateReady ? "ready" : ""}">
+      <div class="gate-card-header">
+        <span>${gate.name}</span>
+        <strong>${stats.progress}%</strong>
+      </div>
+      <h3>${gate.title}</h3>
+      <p>${gate.objective}</p>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: ${stats.progress}%"></div>
+      </div>
+      <p class="gate-meta">${gate.phase} / ${statusText}${isFinalGate ? ` / ${state.signatures.length} assinatura(s)` : ""}</p>
+    </article>
+  `;
+}
+
+function getGateStats(gate) {
+  const gateScenarios = getAllScenarios().filter(({ process }) => gate.processIds.includes(process.id));
+  const completed = gateScenarios.filter(({ scenario }) =>
+    ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+  ).length;
+  const blocked = gateScenarios.some(({ scenario }) =>
+    ["Bloqueado", "Reprovado"].includes(state.scenarios[scenario.id].status)
+  );
+  return {
+    total: gateScenarios.length,
+    completed,
+    progress: percent(completed, gateScenarios.length),
+    blocked,
+  };
+}
+
+function getScenarioMeta(process, feature, scenario) {
+  const profile = processProfiles[process.id];
+  const gate = acceptanceGates.find((item) => item.processIds.includes(process.id)) || acceptanceGates[0];
+  return {
+    gate,
+    type: scenario.type || profile.type,
+    criticality: scenario.criticality || profile.criticality,
+    owner: scenario.owner || profile.owner,
+    evidence: scenario.evidence || profile.evidence,
+    preconditions: getPreconditions(process.id),
+    dataNeeded: getDataNeeded(process.id),
+    expectedResult: scenario.expectedResult || scenario.acceptance,
+  };
+}
+
+function getPreconditions(processId) {
+  const map = {
+    implantacao: "Ambiente definido, acesso liberado e base disponível para conferência.",
+    cadastros: "Usuário com permissão de cadastro e dados de amostra definidos.",
+    operacionais: "Unidade, estrutura, tarefas, materiais e responsáveis previamente cadastrados.",
+    integracoes: "Arquivos ou credenciais de integração disponíveis e ambiente de teste definido.",
+    consultas: "Dados operacionais existentes para filtros, relatórios, mapas ou logs.",
+  };
+  return map[processId];
+}
+
+function getDataNeeded(processId) {
+  const map = {
+    implantacao: "Credenciais, unidade alvo, evidências de migration e amostra da base migrada.",
+    cadastros: "Registros de exemplo, perfis, unidades, materiais e parâmetros usados no Lubit.",
+    operacionais: "Ativo/CILA, tarefa CIT, rota, material, responsável, datas e motivos de retorno.",
+    integracoes: "Planilha/XML de teste, filtros SAP, OS elegíveis e logs esperados.",
+    consultas: "Período, unidade, OS, ativo, relatório ou mapa representativo.",
+  };
+  return map[processId];
+}
+
 function renderChecklist() {
   const filtered = getFilteredScenarios();
   els.scenarioCount.textContent = `${filtered.length} cenário(s)`;
@@ -822,11 +1082,13 @@ function renderChecklist() {
               ${scenarios
                 .map((scenario) => {
                   const data = state.scenarios[scenario.id];
+                  const meta = getScenarioMeta(process, feature, scenario);
                   return `
                     <div class="scenario-row">
                       <div>
                         <strong>${scenario.name}</strong>
                         <p class="muted">${scenario.acceptance}</p>
+                        <p class="scenario-meta">${meta.gate.name} / ${meta.type} / ${meta.criticality}</p>
                       </div>
                       <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
                       <span>${data.owner || "Sem responsável"}</span>
@@ -892,9 +1154,35 @@ function renderExecution() {
   }
 
   const data = state.scenarios[selected.scenario.id];
+  const meta = getScenarioMeta(selected.process, selected.feature, selected.scenario);
   els.scenarioDetail.innerHTML = `
     <p class="eyebrow">${selected.process.name} / ${selected.feature.name}</p>
     <h2>${selected.scenario.name}</h2>
+    <div class="uat-summary">
+      <span>${meta.gate.name}: ${meta.gate.title}</span>
+      <span>${meta.type}</span>
+      <span>${meta.criticality}</span>
+      <span>${meta.owner}</span>
+    </div>
+    <div class="uat-grid">
+      <article>
+        <strong>Pré-condições</strong>
+        <p>${meta.preconditions}</p>
+      </article>
+      <article>
+        <strong>Dados necessários</strong>
+        <p>${meta.dataNeeded}</p>
+      </article>
+      <article>
+        <strong>Resultado esperado</strong>
+        <p>${meta.expectedResult}</p>
+      </article>
+      <article>
+        <strong>Evidência esperada</strong>
+        <p>${meta.evidence}</p>
+      </article>
+    </div>
+    <h3>Critério objetivo de aceite</h3>
     <p>${selected.scenario.acceptance}</p>
     <h3>Passos de teste</h3>
     <ol class="steps-list">
@@ -1002,6 +1290,8 @@ function updateScenario(id, field, value) {
   state.scenarios[id][field] = value;
   persist();
   renderDashboard();
+  renderMethodology();
+  renderProcessMatrix();
   renderChecklist();
   renderIssues();
   if (field === "status") {
@@ -1018,6 +1308,10 @@ function exportJson() {
 
 function exportMarkdown() {
   const all = getAllScenarios();
+  const completed = all.filter(({ scenario }) =>
+    ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+  ).length;
+  const issues = all.filter(({ scenario }) => isIssue(state.scenarios[scenario.id]));
   const lines = [
     `# ${state.project.name}`,
     "",
@@ -1025,34 +1319,81 @@ function exportMarkdown() {
     `Ambiente: ${state.project.environment || "Não informado"}`,
     `Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}`,
     "",
-    "## Resumo",
+    "## Resumo executivo",
     "",
     `- Cenários: ${all.length}`,
-    `- Conclusão: ${percent(
-      all.filter(({ scenario }) => ["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)).length,
-      all.length
-    )}%`,
-    `- Pendências: ${all.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length}`,
+    `- Conclusão: ${percent(completed, all.length)}%`,
+    `- Pendências abertas: ${issues.length}`,
+    `- Assinaturas registradas: ${state.signatures.length}`,
+    "",
+    "## Fases do aceite",
+    "",
+    ...acceptancePhases.flatMap((phase, index) => [
+      `${index + 1}. ${phase.name}: ${phase.description}`,
+    ]),
+    "",
+    "## Gates de aceite",
     "",
   ];
 
+  acceptanceGates.forEach((gate) => {
+    const stats = getGateStats(gate);
+    lines.push(
+      `- ${gate.name} - ${gate.title}: ${stats.progress}% (${stats.completed}/${stats.total}) - ${gate.objective}`
+    );
+  });
+
+  lines.push("", "## Matriz de aprovação", "");
+  lines.push("| Gate | Macroprocesso | Funcionalidade | Cenário | Tipo | Criticidade | Responsável sugerido | Status |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  all.forEach(({ process, feature, scenario }) => {
+    const data = state.scenarios[scenario.id];
+    const meta = getScenarioMeta(process, feature, scenario);
+    lines.push(
+      `| ${meta.gate.name} | ${process.name} | ${feature.name} | ${scenario.name} | ${meta.type} | ${meta.criticality} | ${meta.owner} | ${data.status} |`
+    );
+  });
+
+  lines.push("", "## Roteiro UAT e evidências", "");
   catalog.forEach((process) => {
-    lines.push(`## ${process.name}`, "");
+    lines.push(`### ${process.name}`, "");
     process.features.forEach((feature) => {
-      lines.push(`### ${feature.name}`, "");
+      lines.push(`#### ${feature.name}`, "");
       feature.scenarios.forEach((scenario) => {
         const data = state.scenarios[scenario.id];
-        lines.push(`#### ${scenario.name}`);
+        const meta = getScenarioMeta(process, feature, scenario);
+        lines.push(`##### ${scenario.name}`);
+        lines.push(`- Gate: ${meta.gate.name} - ${meta.gate.title}`);
+        lines.push(`- Tipo: ${meta.type}`);
+        lines.push(`- Criticidade: ${meta.criticality}`);
+        lines.push(`- Pré-condições: ${meta.preconditions}`);
+        lines.push(`- Dados necessários: ${meta.dataNeeded}`);
+        lines.push(`- Resultado esperado: ${meta.expectedResult}`);
+        lines.push(`- Evidência esperada: ${meta.evidence}`);
         lines.push(`- Status: ${data.status}`);
         lines.push(`- Responsável: ${data.owner || "Não informado"}`);
         lines.push(`- Data: ${data.date || "Não informada"}`);
-        lines.push(`- Critério de aceite: ${scenario.acceptance}`);
         lines.push(`- Evidência: ${data.evidence || "Não informada"}`);
         lines.push(`- Pendências: ${data.issues || "Nenhuma"}`);
         lines.push("");
       });
     });
   });
+
+  lines.push("## Pendências e riscos", "");
+  if (!issues.length) {
+    lines.push("Nenhuma pendência aberta.", "");
+  } else {
+    issues.forEach(({ process, feature, scenario }) => {
+      const data = state.scenarios[scenario.id];
+      lines.push(
+        `- ${data.severity || "Média"} / ${data.status}: ${process.name} > ${feature.name} > ${scenario.name} - ${
+          data.issues || "Pendente de descrição"
+        }`
+      );
+    });
+    lines.push("");
+  }
 
   lines.push("## Assinaturas", "");
   if (!state.signatures.length) {
@@ -1109,27 +1450,73 @@ function generateReport() {
         <p class="meta">Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}</p>
         <h2>Resumo executivo</h2>
         <table>
-          <tr><th>Cenários</th><th>Conclusão</th><th>Pendências</th></tr>
-          <tr><td>${all.length}</td><td>${percent(completed, all.length)}%</td><td>${issues.length}</td></tr>
+          <tr><th>Cenários</th><th>Conclusão</th><th>Pendências</th><th>Assinaturas</th></tr>
+          <tr><td>${all.length}</td><td>${percent(completed, all.length)}%</td><td>${issues.length}</td><td>${state.signatures.length}</td></tr>
         </table>
-        <h2>Checklist completo</h2>
+        <h2>Fases do aceite</h2>
+        <table>
+          <thead><tr><th>Fase</th><th>Objetivo</th></tr></thead>
+          <tbody>
+            ${acceptancePhases
+              .map((phase) => `<tr><td>${escapeHtml(phase.name)}</td><td>${escapeHtml(phase.description)}</td></tr>`)
+              .join("")}
+          </tbody>
+        </table>
+        <h2>Gates de aceite</h2>
+        <table>
+          <thead><tr><th>Gate</th><th>Título</th><th>Fase</th><th>Conclusão</th><th>Objetivo</th></tr></thead>
+          <tbody>
+            ${acceptanceGates
+              .map((gate) => {
+                const stats = getGateStats(gate);
+                return `<tr><td>${escapeHtml(gate.name)}</td><td>${escapeHtml(gate.title)}</td><td>${escapeHtml(
+                  gate.phase
+                )}</td><td>${stats.progress}% (${stats.completed}/${stats.total})</td><td>${escapeHtml(gate.objective)}</td></tr>`;
+              })
+              .join("")}
+          </tbody>
+        </table>
+        <h2>Matriz de aprovação</h2>
+        <table>
+          <thead>
+            <tr><th>Gate</th><th>Macroprocesso</th><th>Funcionalidade</th><th>Cenário</th><th>Tipo</th><th>Criticidade</th><th>Responsável sugerido</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            ${all
+              .map(({ process, feature, scenario }) => {
+                const data = state.scenarios[scenario.id];
+                const meta = getScenarioMeta(process, feature, scenario);
+                return `<tr><td>${escapeHtml(meta.gate.name)}</td><td>${escapeHtml(process.name)}</td><td>${escapeHtml(
+                  feature.name
+                )}</td><td>${escapeHtml(scenario.name)}</td><td>${escapeHtml(meta.type)}</td><td>${escapeHtml(
+                  meta.criticality
+                )}</td><td>${escapeHtml(meta.owner)}</td><td class="status">${escapeHtml(data.status)}</td></tr>`;
+              })
+              .join("")}
+          </tbody>
+        </table>
+        <h2>Roteiro UAT e evidências</h2>
         ${catalog
           .map(
             (process) => `
               <h3>${escapeHtml(process.name)}</h3>
               <table>
                 <thead>
-                  <tr><th>Funcionalidade</th><th>Cenário</th><th>Status</th><th>Responsável</th><th>Evidência</th><th>Pendências</th></tr>
+                  <tr><th>Funcionalidade</th><th>Cenário</th><th>Pré-condições</th><th>Dados</th><th>Resultado esperado</th><th>Status</th><th>Responsável</th><th>Evidência</th><th>Pendências</th></tr>
                 </thead>
                 <tbody>
                   ${process.features
                     .flatMap((feature) =>
                       feature.scenarios.map((scenario) => {
                         const data = state.scenarios[scenario.id];
+                        const meta = getScenarioMeta(process, feature, scenario);
                         return `
                           <tr>
                             <td>${escapeHtml(feature.name)}</td>
                             <td>${escapeHtml(scenario.name)}<br><span class="meta">${escapeHtml(scenario.acceptance)}</span></td>
+                            <td>${escapeHtml(meta.preconditions)}</td>
+                            <td>${escapeHtml(meta.dataNeeded)}</td>
+                            <td>${escapeHtml(meta.expectedResult)}</td>
                             <td class="status">${escapeHtml(data.status)}</td>
                             <td>${escapeHtml(data.owner || "")}</td>
                             <td>${escapeHtml(data.evidence || "")}</td>
@@ -1237,6 +1624,8 @@ document.body.addEventListener("click", (event) => {
     const index = Number(event.target.closest(".signature-card").dataset.signatureIndex);
     state.signatures.splice(index, 1);
     persist();
+    renderDashboard();
+    renderMethodology();
     renderSignatures();
   }
 });
@@ -1254,11 +1643,15 @@ els.signaturesList.addEventListener("input", (event) => {
   if (!field || !card) return;
   state.signatures[Number(card.dataset.signatureIndex)][field.dataset.field] = field.value;
   persist();
+  renderDashboard();
+  renderMethodology();
 });
 
 document.getElementById("addSignatureBtn").addEventListener("click", () => {
   state.signatures.push({ area: "", name: "", role: "", date: "", notes: "" });
   persist();
+  renderDashboard();
+  renderMethodology();
   renderSignatures();
 });
 

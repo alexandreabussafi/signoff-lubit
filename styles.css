@@ -159,7 +159,10 @@ h3 {
 .process-card,
 .scenario-card,
 .issue-card,
-.summary-card {
+.summary-card,
+.phase-card,
+.gate-card,
+.framework-section {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -256,7 +259,153 @@ textarea:focus {
 }
 
 .progress-section {
+  margin-bottom: 14px;
   padding: 18px;
+}
+
+.framework-section {
+  margin-bottom: 14px;
+  padding: 18px;
+}
+
+.phase-grid,
+.gates-grid,
+.evidence-grid,
+.uat-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.phase-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gates-grid {
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+}
+
+.evidence-grid,
+.uat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.phase-card,
+.gate-card,
+.evidence-grid article,
+.uat-grid article {
+  padding: 14px;
+}
+
+.phase-card {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.phase-index {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.gate-card.ready {
+  border-color: rgba(33, 112, 68, 0.45);
+}
+
+.gate-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.gate-card h3 {
+  min-height: 44px;
+}
+
+.gate-card p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gate-meta,
+.scenario-meta,
+.table-note {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.matrix-wrapper {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.process-matrix {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: collapse;
+}
+
+.process-matrix th,
+.process-matrix td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.process-matrix th {
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.table-note {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.uat-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.uat-summary span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  padding: 6px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.uat-grid {
+  margin-bottom: 18px;
+}
+
+.uat-grid article,
+.evidence-grid article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
 }
 
 .process-progress-row {
@@ -454,6 +603,13 @@ textarea:focus {
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .phase-grid,
+  .gates-grid,
+  .evidence-grid,
+  .uat-grid {
+    grid-template-columns: 1fr;
+  }
+
   .scenario-list {
     max-height: none;
   }
@@ -473,7 +629,11 @@ textarea:focus {
 
   .summary-grid,
   .detail-grid,
-  .signature-grid {
+  .signature-grid,
+  .phase-grid,
+  .gates-grid,
+  .evidence-grid,
+  .uat-grid {
     grid-template-columns: 1fr;
   }
 

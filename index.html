@@ -65,6 +65,8 @@
       <section class="workspace">
         <nav class="tabs" aria-label="Seções do sign-off">
           <button type="button" class="tab active" data-tab="dashboard">Dashboard</button>
+          <button type="button" class="tab" data-tab="methodology">Framework</button>
+          <button type="button" class="tab" data-tab="matrix">Matriz</button>
           <button type="button" class="tab" data-tab="checklist">Checklist</button>
           <button type="button" class="tab" data-tab="execution">Execução</button>
           <button type="button" class="tab" data-tab="issues">Pendências</button>
@@ -74,8 +76,50 @@
         <section class="tab-panel active" id="dashboardPanel">
           <div class="summary-grid" id="summaryGrid"></div>
           <div class="progress-section">
+            <h2>Gates de aceite</h2>
+            <div class="gates-grid" id="dashboardGates"></div>
+          </div>
+          <div class="progress-section">
             <h2>Progresso por macroprocesso</h2>
             <div id="processProgress"></div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="methodologyPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Framework de aceite</h2>
+              <p>Metodologia de entrega com fases, gates, evidências e sign-off final.</p>
+            </div>
+          </div>
+          <div id="methodology"></div>
+        </section>
+
+        <section class="tab-panel" id="matrixPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Matriz de processos</h2>
+              <p>Visão cruzada de processo, criticidade, tipo, responsável, evidência e status.</p>
+            </div>
+            <span class="muted" id="matrixCount"></span>
+          </div>
+          <div class="matrix-wrapper">
+            <table class="process-matrix">
+              <thead>
+                <tr>
+                  <th>Gate</th>
+                  <th>Macroprocesso</th>
+                  <th>Funcionalidade</th>
+                  <th>Cenário</th>
+                  <th>Tipo</th>
+                  <th>Criticidade</th>
+                  <th>Responsável sugerido</th>
+                  <th>Evidência esperada</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="processMatrix"></tbody>
+            </table>
           </div>
         </section>
 
