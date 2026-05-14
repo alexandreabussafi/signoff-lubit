@@ -1,0 +1,519 @@
+:root {
+  --bg: #f5f7f9;
+  --surface: #ffffff;
+  --surface-alt: #eef2f5;
+  --text: #1d252c;
+  --muted: #65727e;
+  --line: #d8e0e7;
+  --primary: #176b62;
+  --primary-dark: #0e514b;
+  --danger: #ad3232;
+  --warning: #9a6a14;
+  --success: #217044;
+  --blocked: #6d5a85;
+  --shadow: 0 8px 24px rgba(30, 43, 54, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.4;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: 24px;
+}
+
+h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primary-button,
+.ghost-button,
+.wide-button,
+.danger-button {
+  min-height: 38px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: var(--primary);
+  color: #fff;
+}
+
+.primary-button:hover {
+  background: var(--primary-dark);
+}
+
+.ghost-button,
+.wide-button {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.danger-button {
+  width: 100%;
+  background: #fff;
+  border-color: #e2b7b7;
+  color: var(--danger);
+}
+
+.wide-button {
+  width: 100%;
+}
+
+.link-button {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  padding: 0;
+  font-weight: 700;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px;
+}
+
+.project-panel,
+.workspace {
+  min-width: 0;
+}
+
+.project-panel {
+  align-self: start;
+  position: sticky;
+  top: 86px;
+}
+
+.panel-section,
+.progress-section,
+.scenario-detail,
+.signature-card,
+.process-card,
+.scenario-card,
+.issue-card,
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.panel-section {
+  margin-bottom: 14px;
+  padding: 16px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  padding: 9px 10px;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(23, 107, 98, 0.14);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tab {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 9px 12px;
+  font-weight: 700;
+}
+
+.tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.summary-card {
+  padding: 14px;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 28px;
+}
+
+.summary-card span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-section {
+  padding: 18px;
+}
+
+.process-progress-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 64px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.process-progress-row:last-child {
+  border-bottom: 0;
+}
+
+.progress-track {
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+.section-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.section-title-row p,
+.muted {
+  color: var(--muted);
+}
+
+.process-card {
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.process-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface-alt);
+}
+
+.feature-group {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.scenario-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 150px 170px 110px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.scenario-row:first-of-type {
+  border-top: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.status-nao-iniciado { background: #74818d; }
+.status-em-teste { background: var(--warning); }
+.status-aprovado { background: var(--success); }
+.status-reprovado { background: var(--danger); }
+.status-bloqueado { background: var(--blocked); }
+.status-na,
+.status-n-a { background: #4f626b; }
+
+.execution-layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.scenario-list {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  max-height: calc(100vh - 170px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.scenario-card {
+  border-radius: 8px;
+  padding: 12px;
+  text-align: left;
+}
+
+.scenario-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(23, 107, 98, 0.14);
+}
+
+.scenario-card button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.scenario-detail {
+  padding: 18px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.steps-list {
+  margin: 8px 0 18px;
+  padding-left: 22px;
+}
+
+.steps-list li {
+  margin-bottom: 8px;
+}
+
+.issue-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.issue-card {
+  padding: 14px;
+  border-left: 5px solid var(--danger);
+}
+
+.issue-card.blocked {
+  border-left-color: var(--blocked);
+}
+
+.signature-card {
+  margin-bottom: 12px;
+  padding: 14px;
+}
+
+.signature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.empty-state {
+  padding: 22px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+@media (max-width: 1100px) {
+  .app-shell,
+  .execution-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .project-panel {
+    position: static;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .scenario-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-header,
+  .section-title-row,
+  .process-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .app-shell {
+    padding: 12px;
+  }
+
+  .summary-grid,
+  .detail-grid,
+  .signature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-row,
+  .process-progress-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .app-header,
+  .project-panel,
+  .tabs,
+  .header-actions,
+  button {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .tab-panel {
+    display: block;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .workspace,
+  .panel-section,
+  .progress-section,
+  .scenario-detail,
+  .signature-card,
+  .process-card,
+  .scenario-card,
+  .issue-card,
+  .summary-card {
+    box-shadow: none;
+  }
+}

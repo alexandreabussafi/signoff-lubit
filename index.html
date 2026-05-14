@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lubit Sign-off</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Aceite de implantação</p>
+        <h1>Lubit Sign-off</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="ghost-button" id="newProjectBtn">Novo projeto</button>
+        <button type="button" class="ghost-button" id="importBtn">Importar JSON</button>
+        <button type="button" class="primary-button" id="exportBtn">Exportar JSON</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="project-panel">
+        <section class="panel-section">
+          <h2>Projeto</h2>
+          <label>
+            Nome do projeto
+            <input id="projectName" type="text" autocomplete="off">
+          </label>
+          <label>
+            Cliente / unidade
+            <input id="projectClient" type="text" autocomplete="off">
+          </label>
+          <label>
+            Ambiente
+            <input id="projectEnvironment" type="text" autocomplete="off">
+          </label>
+        </section>
+
+        <section class="panel-section">
+          <h2>Filtros</h2>
+          <label>
+            Macroprocesso
+            <select id="processFilter"></select>
+          </label>
+          <label>
+            Status
+            <select id="statusFilter"></select>
+          </label>
+          <label>
+            Busca
+            <input id="searchFilter" type="search" placeholder="Funcionalidade, cenário, responsável">
+          </label>
+        </section>
+
+        <section class="panel-section">
+          <h2>Ações</h2>
+          <button type="button" class="wide-button" id="reportBtn">Gerar relatório HTML</button>
+          <button type="button" class="wide-button" id="markdownBtn">Exportar Markdown</button>
+          <button type="button" class="danger-button" id="resetBtn">Limpar preenchimento</button>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <nav class="tabs" aria-label="Seções do sign-off">
+          <button type="button" class="tab active" data-tab="dashboard">Dashboard</button>
+          <button type="button" class="tab" data-tab="checklist">Checklist</button>
+          <button type="button" class="tab" data-tab="execution">Execução</button>
+          <button type="button" class="tab" data-tab="issues">Pendências</button>
+          <button type="button" class="tab" data-tab="signatures">Assinaturas</button>
+        </nav>
+
+        <section class="tab-panel active" id="dashboardPanel">
+          <div class="summary-grid" id="summaryGrid"></div>
+          <div class="progress-section">
+            <h2>Progresso por macroprocesso</h2>
+            <div id="processProgress"></div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="checklistPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Checklist funcional</h2>
+              <p>Mapa hierárquico de macroprocessos, funcionalidades e cenários de aceite.</p>
+            </div>
+            <span class="muted" id="scenarioCount"></span>
+          </div>
+          <div id="checklist"></div>
+        </section>
+
+        <section class="tab-panel" id="executionPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Execução orientada</h2>
+              <p>Selecione um cenário, execute os passos e registre o resultado.</p>
+            </div>
+          </div>
+          <div class="execution-layout">
+            <div class="scenario-list" id="scenarioList"></div>
+            <article class="scenario-detail" id="scenarioDetail"></article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="issuesPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Pendências</h2>
+              <p>Cenários reprovados, bloqueados ou com defeitos registrados.</p>
+            </div>
+          </div>
+          <div id="issuesList"></div>
+        </section>
+
+        <section class="tab-panel" id="signaturesPanel">
+          <div class="section-title-row">
+            <div>
+              <h2>Assinaturas de aceite</h2>
+              <p>Registre o aceite por área responsável.</p>
+            </div>
+            <button type="button" class="primary-button" id="addSignatureBtn">Adicionar assinatura</button>
+          </div>
+          <div id="signaturesList"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="signatureTemplate">
+      <article class="signature-card">
+        <div class="signature-grid">
+          <label>
+            Área
+            <input data-field="area" type="text" placeholder="Operação, Manutenção, TI">
+          </label>
+          <label>
+            Nome
+            <input data-field="name" type="text">
+          </label>
+          <label>
+            Cargo
+            <input data-field="role" type="text">
+          </label>
+          <label>
+            Data
+            <input data-field="date" type="date">
+          </label>
+        </div>
+        <label>
+          Observações
+          <textarea data-field="notes" rows="3"></textarea>
+        </label>
+        <button type="button" class="link-button" data-action="remove-signature">Remover</button>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

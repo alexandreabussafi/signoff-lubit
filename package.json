@@ -1,0 +1,16 @@
+{
+  "name": "signoff-lubit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicação estática para sign-off de implantação do Lubit.",
+  "scripts": {
+    "start": "npx serve .",
+    "check": "node --check app.js"
+  },
+  "keywords": [
+    "signoff",
+    "acceptance",
+    "lubit"
+  ],
+  "license": "UNLICENSED"
+}
