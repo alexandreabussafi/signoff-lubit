@@ -8,7 +8,7 @@ Ela não substitui o Lubit. Ela organiza o aceite da implantação.
 
 ## Jornada Recomendada
 
-Use a aba **Jornada** como tela principal.
+Use a aba **Jornada** como tela principal. Os três cards superiores funcionam como headers da etapa; ao escolher um card, as linhas de cenários aparecem logo abaixo para edição rápida.
 
 1. **Preparar a entrega**
    - Valide ambiente, usuários, permissões, cadastros, plano migrado e árvore de ativos.

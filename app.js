@@ -728,6 +728,7 @@ const processGroups = [
     icon: "boxes",
     color: "teal",
     processIds: ["implantacao", "cadastros"],
+    summary: "Ambiente, usuários, plano e estrutura.",
     objective: "Ambiente, usuários, cadastros, plano e estrutura prontos para testar.",
   },
   {
@@ -737,6 +738,7 @@ const processGroups = [
     icon: "wrench",
     color: "blue",
     processIds: ["operacionais"],
+    summary: "Plano, OS, retorno, notas e estoque.",
     objective: "Plano, tarefas, geração de OS, retorno, extraordinária, notas e estoque funcionando.",
   },
   {
@@ -746,12 +748,14 @@ const processGroups = [
     icon: "plug",
     color: "violet",
     processIds: ["integracoes", "consultas"],
+    summary: "Importações, SAP, relatórios e assinatura.",
     objective: "Importações, SAP, relatórios, logs, mapas e pendências fechados para assinatura.",
   },
 ];
 
 let state = loadState();
 let selectedScenarioId = getAllScenarios()[0].scenario.id;
+let selectedProcessGroupId = processGroups[0].id;
 
 const els = {
   projectName: document.getElementById("projectName"),
@@ -762,6 +766,7 @@ const els = {
   searchFilter: document.getElementById("searchFilter"),
   journeySummary: document.getElementById("journeySummary"),
   journeySteps: document.getElementById("journeySteps"),
+  journeyLines: document.getElementById("journeyLines"),
   journeyDetail: document.getElementById("journeyDetail"),
   kanbanBoard: document.getElementById("kanbanBoard"),
   reportSummary: document.getElementById("reportSummary"),
@@ -917,7 +922,11 @@ function renderJourney() {
     metricCard("signature", state.signatures.length, "Assinaturas"),
   ].join("");
 
+  if (!processGroups.some((group) => group.id === selectedProcessGroupId)) {
+    selectedProcessGroupId = processGroups[0].id;
+  }
   els.journeySteps.innerHTML = processGroups.map(renderJourneyGroup).join("");
+  renderJourneyLines();
   renderSimpleScenarioDetail();
 }
 
@@ -929,33 +938,91 @@ function renderJourneyGroup(group) {
   const groupIssues = scenarios.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length;
   const next = scenarios.find(({ scenario }) => !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status));
   const progress = percent(completed, scenarios.length);
+  const isActive = selectedProcessGroupId === group.id;
 
   return `
-    <article class="journey-card ${group.color}">
-      <div class="journey-icon">${renderIcon(group.icon)}</div>
+    <article class="journey-card ${group.color} ${isActive ? "active" : ""}" role="button" tabindex="0" data-select-group="${group.id}">
+      <span class="journey-icon">${renderIcon(group.icon)}</span>
       <div class="journey-card-body">
         <div class="journey-card-header">
           <div>
             <p class="eyebrow">${group.shortTitle}</p>
             <h3>${group.title}</h3>
           </div>
-          <strong>${progress}%</strong>
+          <strong class="journey-percent">${progress}%</strong>
         </div>
-        <p>${group.objective}</p>
+        <p>${group.summary || group.objective}</p>
         <div class="progress-track">
           <div class="progress-fill" style="width: ${progress}%"></div>
         </div>
         <div class="journey-card-footer">
           <span>${completed}/${scenarios.length} concluídos</span>
           <span>${groupIssues} pendência(s)</span>
-          ${
-            next
-              ? `<button type="button" class="ghost-button compact-button" data-select-scenario="${next.scenario.id}">Continuar</button>`
-              : `<span class="done-label">Bloco concluído</span>`
-          }
+          <span class="${next ? "next-label" : "done-label"}">${next ? "Abrir bloco" : "Bloco concluído"}</span>
         </div>
       </div>
     </article>
+  `;
+}
+
+function renderJourneyLines() {
+  const group = processGroups.find((item) => item.id === selectedProcessGroupId) || processGroups[0];
+  const filtered = getFilteredScenarios().filter(({ process }) => group.processIds.includes(process.id));
+  const allInGroup = getAllScenarios().filter(({ process }) => group.processIds.includes(process.id));
+
+  if (!filtered.length) {
+    els.journeyLines.innerHTML = `
+      <section class="journey-line-panel ${group.color}">
+        <header class="journey-line-header">
+          <div>
+            <p class="eyebrow">${group.shortTitle}</p>
+            <h3>${group.title}</h3>
+          </div>
+          <span class="status-pill status-nao-iniciado">0 itens</span>
+        </header>
+        <div class="empty-state">Nenhum cenário encontrado para os filtros atuais.</div>
+      </section>
+    `;
+    return;
+  }
+
+  const selectedInGroup = allInGroup.some(({ scenario }) => scenario.id === selectedScenarioId);
+  if (!selectedInGroup) {
+    selectedScenarioId =
+      filtered.find(({ scenario }) => !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status))?.scenario.id ||
+      filtered[0].scenario.id;
+  }
+
+  els.journeyLines.innerHTML = `
+    <section class="journey-line-panel ${group.color}">
+      <header class="journey-line-header">
+        <div>
+          <p class="eyebrow">${group.shortTitle}</p>
+          <h3>${group.title}</h3>
+          <span>${filtered.length}/${allInGroup.length} cenário(s) nesta visão</span>
+        </div>
+        <span class="journey-line-icon">${renderIcon(group.icon)}</span>
+      </header>
+      <div class="journey-line-list">
+        ${filtered
+          .map(({ feature, scenario }, index) => {
+            const data = state.scenarios[scenario.id];
+            const isActive = scenario.id === selectedScenarioId;
+            return `
+              <button type="button" class="journey-line ${isActive ? "active" : ""}" data-select-scenario="${scenario.id}">
+                <span class="journey-line-index">${String(index + 1).padStart(2, "0")}</span>
+                <span class="journey-line-main">
+                  <strong>${scenario.name}</strong>
+                  <small>${feature.name}</small>
+                </span>
+                <span class="journey-line-meta">${data.owner || "Sem responsável"}</span>
+                <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -1013,7 +1080,7 @@ function renderReport() {
   const signatureStatus = state.signatures.length ? "Aceite com assinatura registrada" : "Aguardando assinatura";
 
   els.reportSummary.innerHTML = `
-    <article class="report-card">
+    <article class="report-card report-package">
       <div class="report-icon">${renderIcon("file")}</div>
       <div>
         <p class="eyebrow">Pacote de aceite</p>
@@ -1022,9 +1089,21 @@ function renderReport() {
       </div>
     </article>
     <div class="report-actions">
-      <button type="button" class="wide-button" id="reportBtnInline">Gerar relatório HTML</button>
-      <button type="button" class="wide-button" id="markdownBtnInline">Exportar Markdown</button>
-      <button type="button" class="ghost-button" id="exportBtnInline">Exportar JSON</button>
+      <button type="button" class="export-tile html" id="reportBtnInline">
+        <span>${renderIcon("file")}</span>
+        <strong>Relatório HTML</strong>
+        <small>Abre o documento formal para imprimir ou salvar em PDF.</small>
+      </button>
+      <button type="button" class="export-tile markdown" id="markdownBtnInline">
+        <span>${renderIcon("markdown")}</span>
+        <strong>Markdown</strong>
+        <small>Exporta o mesmo aceite em formato editável.</small>
+      </button>
+      <button type="button" class="export-tile json" id="exportBtnInline">
+        <span>${renderIcon("download")}</span>
+        <strong>JSON</strong>
+        <small>Backup do preenchimento e pacote de evidências.</small>
+      </button>
     </div>
   `;
 
@@ -1131,6 +1210,8 @@ function renderIcon(name) {
     timer: '<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="13" r="8"/>',
     minus: '<path d="M5 12h14"/>',
     file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>',
+    markdown: '<path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
   };
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || icons.circle}</svg>`;
 }
@@ -1685,23 +1766,42 @@ function generateReport() {
         <meta charset="utf-8">
         <title>Relatório de Sign-off Lubit</title>
         <style>
-          body { font-family: Arial, Helvetica, sans-serif; color: #1d252c; margin: 32px; }
-          h1 { margin-bottom: 4px; }
+          body { font-family: Arial, Helvetica, sans-serif; color: #1d252c; margin: 0; background: #f6f8fb; }
+          .report-shell { max-width: 1180px; margin: 24px auto; background: #fff; border: 1px solid #d8e0e7; border-radius: 10px; padding: 28px; box-shadow: 0 8px 28px rgba(30,43,54,.08); }
+          .cover { border-top: 6px solid #176b62; padding-top: 16px; }
+          h1 { margin-bottom: 4px; font-size: 30px; }
           h2 { margin-top: 28px; border-bottom: 1px solid #d8e0e7; padding-bottom: 6px; }
-          table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
+          table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
           th, td { border: 1px solid #d8e0e7; padding: 8px; text-align: left; vertical-align: top; }
-          th { background: #eef2f5; }
+          th { background: #eef2f5; color: #425466; text-transform: uppercase; font-size: 11px; }
+          .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0 18px; }
+          .kpi { border: 1px solid #d8e0e7; border-top: 4px solid #176b62; border-radius: 8px; padding: 12px; background: #fbfcfd; }
+          .kpi:nth-child(2) { border-top-color: #217044; }
+          .kpi:nth-child(3) { border-top-color: #f97316; }
+          .kpi:nth-child(4) { border-top-color: #7c3aed; }
+          .kpi strong { display: block; font-size: 24px; }
+          .kpi span { color: #65727e; font-size: 12px; font-weight: 700; }
           .meta { color: #65727e; }
           .status { font-weight: 700; }
-          @media print { body { margin: 16px; } }
+          @media print { body { background: #fff; } .report-shell { margin: 0; border: 0; box-shadow: none; padding: 0; } }
         </style>
       </head>
       <body>
-        <h1>${escapeHtml(state.project.name)}</h1>
-        <p class="meta">Cliente/unidade: ${escapeHtml(state.project.client || "Não informado")}</p>
-        <p class="meta">Ambiente: ${escapeHtml(state.project.environment || "Não informado")}</p>
-        <p class="meta">Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}</p>
+        <main class="report-shell">
+        <section class="cover">
+          <p class="meta">Relatório formal de aceite</p>
+          <h1>${escapeHtml(state.project.name)}</h1>
+          <p class="meta">Cliente/unidade: ${escapeHtml(state.project.client || "Não informado")}</p>
+          <p class="meta">Ambiente: ${escapeHtml(state.project.environment || "Não informado")}</p>
+          <p class="meta">Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}</p>
+        </section>
         <h2>Resumo executivo</h2>
+        <div class="kpi-grid">
+          <article class="kpi"><strong>${all.length}</strong><span>Cenários</span></article>
+          <article class="kpi"><strong>${percent(completed, all.length)}%</strong><span>Conclusão</span></article>
+          <article class="kpi"><strong>${issues.length}</strong><span>Pendências</span></article>
+          <article class="kpi"><strong>${state.signatures.length}</strong><span>Assinaturas</span></article>
+        </div>
         <table>
           <tr><th>Cenários</th><th>Conclusão</th><th>Pendências</th><th>Assinaturas</th></tr>
           <tr><td>${all.length}</td><td>${percent(completed, all.length)}%</td><td>${issues.length}</td><td>${state.signatures.length}</td></tr>
@@ -1810,6 +1910,7 @@ function generateReport() {
                 .join("")}</tbody></table>`
             : "<p>Nenhuma assinatura registrada.</p>"
         }
+        </main>
       </body>
     </html>
   `);
@@ -1868,7 +1969,29 @@ document.body.addEventListener("click", (event) => {
   const scenarioButton = event.target.closest("[data-select-scenario]");
   if (scenarioButton) {
     selectedScenarioId = scenarioButton.dataset.selectScenario;
+    const selected = getAllScenarios().find(({ scenario }) => scenario.id === selectedScenarioId);
+    if (selected) {
+      selectedProcessGroupId = getProcessGroup(selected.process.id).id;
+    }
     document.querySelector('[data-tab="journey"]').click();
+    renderJourney();
+    return;
+  }
+
+  const groupButton = event.target.closest("[data-select-group]");
+  if (groupButton) {
+    selectedProcessGroupId = groupButton.dataset.selectGroup;
+    const group = processGroups.find((item) => item.id === selectedProcessGroupId) || processGroups[0];
+    const next =
+      getFilteredScenarios().find(
+        ({ process, scenario }) =>
+          group.processIds.includes(process.id) && !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status)
+      ) ||
+      getFilteredScenarios().find(({ process }) => group.processIds.includes(process.id)) ||
+      getAllScenarios().find(({ process }) => group.processIds.includes(process.id));
+    if (next) {
+      selectedScenarioId = next.scenario.id;
+    }
     renderJourney();
     return;
   }

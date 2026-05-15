@@ -24,7 +24,8 @@ npx serve .
 
 ## Funcionalidades
 
-- Jornada simplificada em 3 blocos: dados iniciais, operação principal, apoio e integrações.
+- Jornada simplificada em 3 blocos no topo: dados iniciais, operação principal, apoio e integrações.
+- Linhas de cenários aparecem abaixo conforme o bloco escolhido, mantendo a edição rápida no mesmo fluxo.
 - Visual mais leve, colorido e com ícones SVG.
 - Kanban por status para acompanhar a validação.
 - Dashboard reduzido com progresso, aprovados, pendências e assinaturas.
@@ -35,7 +36,7 @@ npx serve .
 - Persistência automática no navegador via `localStorage`.
 - Exportação/importação JSON.
 - Exportação Markdown formal.
-- Relatório HTML imprimível com resumo executivo, matriz formal, roteiro UAT, pendências/riscos e assinaturas.
+- Relatório HTML visual, imprimível e organizado como documento de aceite.
 
 ## Dados e backup
 
