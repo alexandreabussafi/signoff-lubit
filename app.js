@@ -766,6 +766,7 @@ let selectedScenarioId = getAllScenarios()[0].scenario.id;
 let selectedProcessGroupId = processGroups[0].id;
 let journeyViewMode = "lines";
 let isDrawerOpen = false;
+let draggedScenarioId = null;
 
 const els = {
   projectName: document.getElementById("projectName"),
@@ -785,6 +786,10 @@ const els = {
   issuesList: document.getElementById("issuesList"),
   signaturesList: document.getElementById("signaturesList"),
   importFile: document.getElementById("importFile"),
+  headerProgressLabel: document.getElementById("headerProgressLabel"),
+  headerProgressFill: document.getElementById("headerProgressFill"),
+  actionMenuBtn: document.getElementById("actionMenuBtn"),
+  actionMenu: document.getElementById("actionMenu"),
 };
 
 function loadState() {
@@ -925,6 +930,7 @@ function renderJourney() {
   const approved = all.filter(({ scenario }) => state.scenarios[scenario.id].status === "Aprovado").length;
   const issues = all.filter(({ scenario }) => isIssue(state.scenarios[scenario.id])).length;
   const progress = percent(completed, all.length);
+  renderHeaderProgress(progress);
 
   els.journeySummary.innerHTML = [
     metricCard("check", `${progress}%`, "Progresso"),
@@ -942,6 +948,11 @@ function renderJourney() {
   els.journeySteps.innerHTML = processGroups.map(renderJourneyGroup).join("");
   renderJourneyLines();
   renderSimpleScenarioDetail();
+}
+
+function renderHeaderProgress(progress) {
+  els.headerProgressLabel.textContent = `${progress}%`;
+  els.headerProgressFill.style.width = `${progress}%`;
 }
 
 function renderJourneyGroup(group) {
@@ -1011,6 +1022,7 @@ function renderJourneyLines() {
     els.journeyLines.innerHTML = `
       <section class="journey-line-panel ${group.color}">
         ${journeyPanelHeader(group, filtered.length, allInGroup.length)}
+        <p class="kanban-hint">${renderIcon("move")} Arraste um card para outra coluna para atualizar o status. A coluna Pendência marca o cenário como Reprovado.</p>
         <div class="journey-kanban-wrap">
           ${renderKanbanBoard(filtered, "journey-kanban")}
         </div>
@@ -1060,18 +1072,18 @@ function journeyPanelHeader(group, visibleCount, totalCount) {
 
 function renderKanbanBoard(rows, extraClass = "") {
   const columns = [
-    { id: "todo", title: "Não iniciado", icon: "circle", match: (data) => data.status === "Não iniciado" },
-    { id: "testing", title: "Em teste", icon: "timer", match: (data) => data.status === "Em teste" },
-    { id: "done", title: "Aprovado", icon: "check", match: (data) => data.status === "Aprovado" },
-    { id: "issue", title: "Pendência", icon: "alert", match: (data) => ["Reprovado", "Bloqueado"].includes(data.status) || Boolean(data.issues.trim()) },
-    { id: "na", title: "N/A", icon: "minus", match: (data) => data.status === "N/A" },
+    { id: "todo", title: "Não iniciado", icon: "circle", dropStatus: "Não iniciado", match: (data) => data.status === "Não iniciado" },
+    { id: "testing", title: "Em teste", icon: "timer", dropStatus: "Em teste", match: (data) => data.status === "Em teste" },
+    { id: "done", title: "Aprovado", icon: "check", dropStatus: "Aprovado", match: (data) => data.status === "Aprovado" },
+    { id: "issue", title: "Pendência", icon: "alert", dropStatus: "Reprovado", match: (data) => ["Reprovado", "Bloqueado"].includes(data.status) || Boolean(data.issues.trim()) },
+    { id: "na", title: "N/A", icon: "minus", dropStatus: "N/A", match: (data) => data.status === "N/A" },
   ];
 
   return `<div class="kanban-board ${extraClass}">${columns
     .map((column) => {
       const cards = rows.filter(({ scenario }) => column.match(state.scenarios[scenario.id]));
       return `
-        <section class="kanban-column ${column.id}">
+        <section class="kanban-column ${column.id}" data-drop-status="${column.dropStatus}">
           <header>
             <span>${renderIcon(column.icon)}</span>
             <strong>${column.title}</strong>
@@ -1084,12 +1096,14 @@ function renderKanbanBoard(rows, extraClass = "") {
                   const data = state.scenarios[scenario.id];
                   const group = getProcessGroup(process.id);
                   return `
-                    <button type="button" class="kanban-card ${group.color}" data-select-scenario="${scenario.id}">
-                      <span class="kanban-tag">${renderIcon(group.icon)} ${group.shortTitle}</span>
-                      <strong>${scenario.name}</strong>
-                      <small>${feature.name}</small>
-                      <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
-                    </button>
+                    <article class="kanban-card ${group.color}" draggable="true" data-drag-scenario="${scenario.id}">
+                      <button type="button" class="kanban-card-main" data-select-scenario="${scenario.id}">
+                        <span class="kanban-tag">${renderIcon(group.icon)} ${group.shortTitle}</span>
+                        <strong>${scenario.name}</strong>
+                        <small>${feature.name}</small>
+                        <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
+                      </button>
+                    </article>
                   `;
                 })
                 .join("") || `<p class="empty-column">Sem itens</p>`
@@ -1295,6 +1309,7 @@ function renderIcon(name) {
     file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>',
     markdown: '<path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+    move: '<path d="M5 9 2 12l3 3"/><path d="m9 5 3-3 3 3"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="M12 2v20"/>',
     x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   };
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || icons.circle}</svg>`;
@@ -2107,7 +2122,76 @@ els.journeyViewToggle.addEventListener("click", (event) => {
   renderJourney();
 });
 
+function setActionMenuOpen(isOpen) {
+  els.actionMenu.hidden = !isOpen;
+  els.actionMenuBtn.setAttribute("aria-expanded", String(isOpen));
+}
+
+function closeActionMenu() {
+  setActionMenuOpen(false);
+}
+
+els.actionMenuBtn.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setActionMenuOpen(els.actionMenu.hidden);
+});
+
+function clearKanbanDragState() {
+  draggedScenarioId = null;
+  document.body.classList.remove("is-kanban-dragging");
+  document.querySelectorAll(".kanban-card.is-dragging, .kanban-column.drag-over").forEach((element) => {
+    element.classList.remove("is-dragging", "drag-over");
+  });
+}
+
+document.body.addEventListener("dragstart", (event) => {
+  const card = event.target.closest("[data-drag-scenario]");
+  if (!card) return;
+  draggedScenarioId = card.dataset.dragScenario;
+  card.classList.add("is-dragging");
+  document.body.classList.add("is-kanban-dragging");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", draggedScenarioId);
+});
+
+document.body.addEventListener("dragend", clearKanbanDragState);
+
+document.body.addEventListener("dragover", (event) => {
+  const column = event.target.closest("[data-drop-status]");
+  if (!column || !draggedScenarioId) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  document.querySelectorAll(".kanban-column.drag-over").forEach((item) => {
+    if (item !== column) item.classList.remove("drag-over");
+  });
+  column.classList.add("drag-over");
+});
+
+document.body.addEventListener("dragleave", (event) => {
+  const column = event.target.closest("[data-drop-status]");
+  if (!column || column.contains(event.relatedTarget)) return;
+  column.classList.remove("drag-over");
+});
+
+document.body.addEventListener("drop", (event) => {
+  const column = event.target.closest("[data-drop-status]");
+  const scenarioId = event.dataTransfer.getData("text/plain") || draggedScenarioId;
+  if (!column || !scenarioId || !state.scenarios[scenarioId]) return;
+  event.preventDefault();
+  const nextStatus = column.dataset.dropStatus;
+  clearKanbanDragState();
+  selectedScenarioId = scenarioId;
+  updateScenario(scenarioId, "status", nextStatus);
+});
+
 document.body.addEventListener("click", (event) => {
+  const clickedMenuItem = event.target.closest("#actionMenu .menu-item");
+  if (clickedMenuItem) {
+    closeActionMenu();
+  } else if (!event.target.closest(".action-menu")) {
+    closeActionMenu();
+  }
+
   const scenarioButton = event.target.closest("[data-select-scenario]");
   if (scenarioButton) {
     selectedScenarioId = scenarioButton.dataset.selectScenario;
@@ -2166,6 +2250,11 @@ document.body.addEventListener("click", (event) => {
 els.drawerBackdrop.addEventListener("click", () => closeScenarioDrawer());
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !els.actionMenu.hidden) {
+    closeActionMenu();
+    return;
+  }
+
   if (event.key === "Escape" && isDrawerOpen) {
     closeScenarioDrawer();
     return;

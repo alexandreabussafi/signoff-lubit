@@ -26,6 +26,8 @@ npx serve .
 
 - Jornada simplificada em 3 blocos no topo: dados iniciais, operação principal, apoio e integrações.
 - Visualização alternável entre Linhas e Kanban dentro da Jornada.
+- Header dark com progresso geral e menu global `Ações`.
+- Kanban com drag-and-drop para atualizar status por coluna.
 - Clique em qualquer cenário abre um sidebar largo para aprovar, reprovar, bloquear, registrar evidência e pendência.
 - Preset `Aplicar N/A opcionais` para marcar módulos fora do escopo sem apagar evidências ou observações.
 - Visual mais leve, colorido e com ícones SVG.

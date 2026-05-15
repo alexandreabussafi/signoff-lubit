@@ -91,9 +91,19 @@ async function fillScenario(page, scenarioId, status, index, options = {}) {
   await closeDrawer(page);
 }
 
+async function openActionMenu(page) {
+  await page.locator("#actionMenuBtn").click();
+  await expect(page.locator("#actionMenu")).toBeVisible();
+}
+
+async function clickActionMenuItem(page, selector) {
+  await openActionMenu(page);
+  await page.locator(selector).click();
+}
+
 async function downloadByClick(page, selector, targetName) {
   const downloadPromise = page.waitForEvent("download");
-  await page.locator(selector).click();
+  await clickActionMenuItem(page, selector);
   const download = await downloadPromise;
   const target = path.join(ARTIFACT_DIR, targetName);
   await download.saveAs(target);
@@ -663,7 +673,7 @@ test("simula sign-off completo de cliente com N/A, pendencias e manual", async (
     expect(dialog.message()).toContain("N/A");
     await dialog.accept();
   });
-  await page.locator("#optionalNaBtn").click();
+  await clickActionMenuItem(page, "#optionalNaBtn");
   await expect(page.locator('[data-select-group="apoio"]')).toHaveClass(/active/);
   await expect(page.locator(".journey-kanban .kanban-column.na .kanban-card")).toHaveCount(5);
   screenshots.naPreset = await screenshot(page, "04-preset-na-opcionais");
@@ -746,7 +756,7 @@ test("simula sign-off completo de cliente com N/A, pendencias e manual", async (
   screenshots.final = await screenshot(page, "07-signoff-final");
 
   const popupPromise = page.waitForEvent("popup");
-  await page.locator("#reportBtn").click();
+  await clickActionMenuItem(page, "#reportBtn");
   const report = await popupPromise;
   await report.waitForLoadState("domcontentloaded");
   await report.screenshot({ path: path.join(ARTIFACT_DIR, "08-relatorio-html.png"), fullPage: true });

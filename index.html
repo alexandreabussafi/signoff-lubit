@@ -8,23 +8,64 @@
   </head>
   <body>
     <header class="app-header">
-      <div>
-        <p class="eyebrow">Aceite de implantação</p>
-        <h1>Lubit Sign-off</h1>
+      <div class="app-brand">
+        <span class="app-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5-8 4.5L4 7.5Z"/><path d="M4 7.5v9L12 21l8-4.5v-9"/><path d="M12 12v9"/></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Aceite de implantação</p>
+          <h1>Lubit Sign-off</h1>
+          <p class="app-subtitle">Jornada de aceite, evidências e assinatura final.</p>
+        </div>
+      </div>
+      <div class="header-status" aria-label="Progresso geral do aceite">
+        <div>
+          <strong id="headerProgressLabel">0%</strong>
+          <span>Progresso do aceite</span>
+        </div>
+        <div class="header-progress-track" aria-hidden="true">
+          <span id="headerProgressFill"></span>
+        </div>
       </div>
       <div class="header-actions">
         <button type="button" class="ghost-button action-new" id="newProjectBtn">
           <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           <span>Novo projeto</span>
         </button>
-        <button type="button" class="ghost-button action-import" id="importBtn">
-          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 5v12"/></svg>
-          <span>Importar JSON</span>
-        </button>
-        <button type="button" class="primary-button" id="exportBtn">
-          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-          <span>Exportar JSON</span>
-        </button>
+        <div class="action-menu">
+          <button type="button" class="icon-menu-button" id="actionMenuBtn" aria-label="Abrir ações" aria-expanded="false" aria-controls="actionMenu">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01"/><path d="M12 5h.01"/><path d="M12 19h.01"/></svg>
+            <span>Ações</span>
+          </button>
+          <div class="action-dropdown" id="actionMenu" role="menu" hidden>
+            <button type="button" class="menu-item" id="importBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 5v12"/></svg>
+              <span><strong>Importar JSON</strong><small>Continuar um aceite salvo</small></span>
+            </button>
+            <button type="button" class="menu-item" id="exportBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              <span><strong>Exportar JSON</strong><small>Pacote oficial de backup</small></span>
+            </button>
+            <div class="menu-separator" role="separator"></div>
+            <button type="button" class="menu-item" id="reportBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
+              <span><strong>Relatório HTML</strong><small>Documento formal para PDF</small></span>
+            </button>
+            <button type="button" class="menu-item" id="markdownBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/></svg>
+              <span><strong>Markdown</strong><small>Versão editável do aceite</small></span>
+            </button>
+            <div class="menu-separator" role="separator"></div>
+            <button type="button" class="menu-item warning" id="optionalNaBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M4 4h16v16H4z"/></svg>
+              <span><strong>Aplicar N/A opcionais</strong><small>SAP, XML, alarmes e mapas fora do escopo</small></span>
+            </button>
+            <button type="button" class="menu-item danger" id="resetBtn" role="menuitem">
+              <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              <span><strong>Limpar preenchimento</strong><small>Remove resultados e assinaturas</small></span>
+            </button>
+          </div>
+        </div>
         <input id="importFile" type="file" accept="application/json,.json" hidden>
       </div>
     </header>
@@ -63,24 +104,9 @@
           </label>
         </section>
 
-        <section class="panel-section">
-          <h2>Ações</h2>
-          <button type="button" class="wide-button action-na" id="optionalNaBtn">
-            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M4 4h16v16H4z"/></svg>
-            <span>Aplicar N/A opcionais</span>
-          </button>
-          <button type="button" class="wide-button action-html" id="reportBtn">
-            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
-            <span>Relatório HTML</span>
-          </button>
-          <button type="button" class="wide-button action-markdown" id="markdownBtn">
-            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/></svg>
-            <span>Markdown</span>
-          </button>
-          <button type="button" class="danger-button" id="resetBtn">
-            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-            <span>Limpar preenchimento</span>
-          </button>
+        <section class="panel-section support-panel">
+          <h2>Pacote de aceite</h2>
+          <p>Use o menu <strong>Ações</strong> no topo para importar, exportar, gerar relatório ou aplicar N/A opcionais.</p>
         </section>
       </aside>
 
