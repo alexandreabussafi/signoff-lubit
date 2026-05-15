@@ -9,7 +9,7 @@ module.exports = defineConfig({
   fullyParallel: false,
   reporter: [
     ["list"],
-    ["html", { outputFolder: "artifacts/signoff-approved/playwright-report", open: "never" }],
+    ["html", { outputFolder: "artifacts/client-signoff-complete/playwright-report", open: "never" }],
   ],
   use: {
     baseURL: "http://127.0.0.1:4173",

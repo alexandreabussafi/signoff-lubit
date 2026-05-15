@@ -107,20 +107,36 @@ h3 {
 .ghost-button,
 .wide-button,
 .danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: 38px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid transparent;
-  padding: 8px 12px;
+  padding: 8px 13px;
   font-weight: 700;
+  line-height: 1.1;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+  white-space: nowrap;
 }
 
 .primary-button {
-  background: var(--primary);
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  border-color: rgba(14, 81, 75, 0.22);
   color: #fff;
+  box-shadow: 0 6px 14px rgba(23, 107, 98, 0.18);
 }
 
 .primary-button:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(180deg, #1f7f75, var(--primary-dark));
+  box-shadow: 0 8px 18px rgba(23, 107, 98, 0.22);
+  transform: translateY(-1px);
 }
 
 .ghost-button,
@@ -128,29 +144,89 @@ h3 {
   background: var(--surface);
   border-color: var(--line);
   color: var(--text);
+  box-shadow: 0 1px 2px rgba(30, 43, 54, 0.04);
+}
+
+.ghost-button:hover,
+.wide-button:hover {
+  border-color: rgba(23, 107, 98, 0.24);
+  background: #fbfdfd;
+  box-shadow: 0 5px 14px rgba(30, 43, 54, 0.08);
+  transform: translateY(-1px);
 }
 
 .danger-button {
   width: 100%;
-  background: #fff;
-  border-color: #e2b7b7;
+  background: #fff8f8;
+  border-color: rgba(173, 50, 50, 0.24);
   color: var(--danger);
+}
+
+.danger-button:hover {
+  background: #fff1f2;
+  border-color: rgba(173, 50, 50, 0.36);
+  box-shadow: 0 5px 14px rgba(173, 50, 50, 0.1);
+  transform: translateY(-1px);
 }
 
 .wide-button {
   width: 100%;
+  justify-content: flex-start;
 }
 
 .action-html {
   border-color: rgba(37, 99, 235, 0.28);
-  background: var(--blue-soft);
+  background: linear-gradient(180deg, #f7faff, var(--blue-soft));
   color: var(--blue);
 }
 
 .action-markdown {
   border-color: rgba(124, 58, 237, 0.28);
-  background: var(--violet-soft);
+  background: linear-gradient(180deg, #fbf8ff, var(--violet-soft));
   color: var(--violet);
+}
+
+.action-na {
+  border-color: rgba(249, 115, 22, 0.3);
+  background: linear-gradient(180deg, #fffaf5, var(--orange-soft));
+  color: var(--orange);
+}
+
+.action-new {
+  border-color: rgba(8, 145, 178, 0.22);
+  background: linear-gradient(180deg, #ffffff, var(--cyan-soft));
+  color: var(--cyan);
+}
+
+.action-import {
+  border-color: rgba(124, 58, 237, 0.22);
+  background: linear-gradient(180deg, #ffffff, var(--violet-soft));
+  color: var(--violet);
+}
+
+.button-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.primary-button:focus-visible,
+.ghost-button:focus-visible,
+.wide-button:focus-visible,
+.danger-button:focus-visible,
+.view-toggle:focus-visible {
+  outline: 3px solid rgba(8, 145, 178, 0.2);
+  outline-offset: 2px;
+}
+
+.panel-section > .wide-button + .wide-button,
+.panel-section > .wide-button + .danger-button {
+  margin-top: 8px;
 }
 
 .link-button {
@@ -258,27 +334,49 @@ textarea:focus {
 
 .view-switch {
   display: inline-flex;
-  gap: 4px;
-  padding: 4px;
+  gap: 3px;
+  padding: 3px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--surface);
+  background: #f8fafc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .view-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-height: 34px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 6px 11px;
   font-weight: 800;
+  line-height: 1;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.view-toggle:hover {
+  color: var(--primary-dark);
+  background: rgba(230, 246, 243, 0.7);
 }
 
 .view-toggle.active {
-  background: var(--teal-soft);
+  background: #ffffff;
   color: var(--primary-dark);
-  box-shadow: inset 0 0 0 1px rgba(23, 107, 98, 0.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(23, 107, 98, 0.18),
+    0 3px 10px rgba(30, 43, 54, 0.08);
+}
+
+.view-toggle.active .button-icon {
+  color: var(--teal);
 }
 
 .tab-panel {

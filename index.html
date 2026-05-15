@@ -13,9 +13,18 @@
         <h1>Lubit Sign-off</h1>
       </div>
       <div class="header-actions">
-        <button type="button" class="ghost-button" id="newProjectBtn">Novo projeto</button>
-        <button type="button" class="ghost-button" id="importBtn">Importar JSON</button>
-        <button type="button" class="primary-button" id="exportBtn">Exportar JSON</button>
+        <button type="button" class="ghost-button action-new" id="newProjectBtn">
+          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Novo projeto</span>
+        </button>
+        <button type="button" class="ghost-button action-import" id="importBtn">
+          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 5v12"/></svg>
+          <span>Importar JSON</span>
+        </button>
+        <button type="button" class="primary-button" id="exportBtn">
+          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <span>Exportar JSON</span>
+        </button>
         <input id="importFile" type="file" accept="application/json,.json" hidden>
       </div>
     </header>
@@ -56,9 +65,22 @@
 
         <section class="panel-section">
           <h2>Ações</h2>
-          <button type="button" class="wide-button action-html" id="reportBtn">Relatório HTML</button>
-          <button type="button" class="wide-button action-markdown" id="markdownBtn">Markdown</button>
-          <button type="button" class="danger-button" id="resetBtn">Limpar preenchimento</button>
+          <button type="button" class="wide-button action-na" id="optionalNaBtn">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M4 4h16v16H4z"/></svg>
+            <span>Aplicar N/A opcionais</span>
+          </button>
+          <button type="button" class="wide-button action-html" id="reportBtn">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
+            <span>Relatório HTML</span>
+          </button>
+          <button type="button" class="wide-button action-markdown" id="markdownBtn">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/></svg>
+            <span>Markdown</span>
+          </button>
+          <button type="button" class="danger-button" id="resetBtn">
+            <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            <span>Limpar preenchimento</span>
+          </button>
         </section>
       </aside>
 
@@ -76,8 +98,14 @@
               <p>Prepare a entrega, valide a operação e registre o aceite final.</p>
             </div>
             <div class="view-switch" id="journeyViewToggle" aria-label="Visualização da jornada">
-              <button type="button" class="view-toggle active" data-view-mode="lines">Linhas</button>
-              <button type="button" class="view-toggle" data-view-mode="kanban">Kanban</button>
+              <button type="button" class="view-toggle active" data-view-mode="lines">
+                <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+                <span>Linhas</span>
+              </button>
+              <button type="button" class="view-toggle" data-view-mode="kanban">
+                <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v16H4z"/><path d="M14 4h6v10h-6z"/></svg>
+                <span>Kanban</span>
+              </button>
             </div>
           </div>
           <div class="summary-grid compact" id="journeySummary"></div>

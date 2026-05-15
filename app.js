@@ -753,6 +753,14 @@ const processGroups = [
   },
 ];
 
+const optionalNaScenarioIds = [
+  "upload-xml",
+  "configurar-alarmes",
+  "mapas-validacao",
+  "sap-integrar-os",
+  "sap-reintegracao",
+];
+
 let state = loadState();
 let selectedScenarioId = getAllScenarios()[0].scenario.id;
 let selectedProcessGroupId = processGroups[0].id;
@@ -1708,6 +1716,36 @@ function updateScenario(id, field, value) {
   renderReport();
 }
 
+function applyOptionalNaPreset() {
+  const message = [
+    "Aplicar N/A aos módulos opcionais?",
+    "",
+    "Serão marcados como N/A apenas cenários ainda não iniciados ou em teste.",
+    "Evidências, pendências e observações já preenchidas serão preservadas.",
+    "Você poderá revisar cada cenário depois.",
+  ].join("\n");
+
+  if (!confirm(message)) return;
+
+  let updated = 0;
+  optionalNaScenarioIds.forEach((id) => {
+    const data = state.scenarios[id];
+    if (!data || !["Não iniciado", "Em teste"].includes(data.status)) return;
+    data.status = "N/A";
+    updated += 1;
+  });
+
+  persist();
+  selectedProcessGroupId = "apoio";
+  journeyViewMode = "kanban";
+  closeScenarioDrawer();
+  render();
+
+  if (!updated) {
+    alert("Nenhum cenário opcional elegível foi alterado.");
+  }
+}
+
 function exportJson() {
   const blob = new Blob([JSON.stringify(state, null, 2)], {
     type: "application/json",
@@ -2168,6 +2206,7 @@ document.getElementById("addSignatureBtn").addEventListener("click", () => {
 document.getElementById("exportBtn").addEventListener("click", exportJson);
 document.getElementById("markdownBtn").addEventListener("click", exportMarkdown);
 document.getElementById("reportBtn").addEventListener("click", generateReport);
+document.getElementById("optionalNaBtn").addEventListener("click", applyOptionalNaPreset);
 document.getElementById("importBtn").addEventListener("click", () => els.importFile.click());
 
 els.importFile.addEventListener("change", async () => {

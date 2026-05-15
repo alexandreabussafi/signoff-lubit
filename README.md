@@ -27,6 +27,7 @@ npx serve .
 - Jornada simplificada em 3 blocos no topo: dados iniciais, operação principal, apoio e integrações.
 - Visualização alternável entre Linhas e Kanban dentro da Jornada.
 - Clique em qualquer cenário abre um sidebar largo para aprovar, reprovar, bloquear, registrar evidência e pendência.
+- Preset `Aplicar N/A opcionais` para marcar módulos fora do escopo sem apagar evidências ou observações.
 - Visual mais leve, colorido e com ícones SVG.
 - Kanban por status filtrado pelo bloco selecionado.
 - Dashboard reduzido com progresso, aprovados, pendências e assinaturas.
@@ -44,6 +45,14 @@ npx serve .
 Nesta primeira versão, os dados preenchidos ficam no navegador via `localStorage`. Eles não são compartilhados automaticamente entre usuários, computadores ou navegadores.
 
 Para preservar um aceite, use **Exportar JSON**. Esse arquivo funciona como backup e pacote oficial do projeto. Para continuar um aceite em outra máquina, use **Importar JSON**.
+
+## Manual e simulação
+
+- Manual de treinamento: `docs/treinamento-signoff.html`.
+- Manual com simulação de cliente e prints: `docs/manual-signoff-cliente.html`.
+- Teste E2E completo: `tests/signoff-client-complete.spec.js`.
+
+A simulação de cliente aprova os cenários aplicáveis, marca módulos opcionais como `N/A`, cria e resolve pendências temporárias, registra 3 assinaturas e valida exportação/importação JSON.
 
 ## Publicação na Vercel
 
