@@ -4,6 +4,11 @@ const { test, expect } = require("@playwright/test");
 
 const ARTIFACT_DIR = path.join(__dirname, "..", "artifacts", "signoff-approved");
 const STORAGE_KEY = "lubit-signoff-state-v1";
+const GROUPS = [
+  { id: "dados", count: 10 },
+  { id: "operacao", count: 11 },
+  { id: "apoio", count: 11 },
+];
 
 async function screenshot(page, name) {
   await page.screenshot({
@@ -26,43 +31,61 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
 });
 
-test("aprova todos os cenários e gera pacote de evidências", async ({ page }) => {
+test("aprova todos os cenarios e gera pacote de evidencias", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Jornada" })).toBeVisible();
+  await expect(page.locator('[data-tab="kanban"]')).toHaveCount(0);
   await expect(page.locator(".journey-card")).toHaveCount(3);
+  await expect(page.locator(".journey-line")).toHaveCount(10);
+  await screenshot(page, "01-jornada-linhas");
 
-  await page.getByRole("button", { name: "Kanban" }).click();
-  const totalScenarios = await page.locator(".kanban-card").count();
-  expect(totalScenarios).toBe(32);
+  await page.locator('[data-view-mode="kanban"]').click();
+  await expect(page.locator(".journey-kanban .kanban-card")).toHaveCount(10);
+  await screenshot(page, "02-jornada-kanban");
 
-  for (let index = 0; index < totalScenarios; index += 1) {
-    await page.getByRole("button", { name: "Kanban" }).click();
-    const nextCard = page.locator(".kanban-column.todo .kanban-card").first();
-    await expect(nextCard).toBeVisible();
-    await nextCard.click();
+  let approvedIndex = 0;
+  for (const group of GROUPS) {
+    await page.locator(`[data-select-group="${group.id}"]`).click();
+    await page.locator('[data-view-mode="lines"]').click();
+    await expect(page.locator(".journey-line")).toHaveCount(group.count);
 
-    const journeyDetail = page.locator("#journeyDetail");
-    await setField(page, '[data-field="owner"]', "QA Sign-off", journeyDetail);
-    await setField(page, '[data-field="date"]', "2026-05-14", journeyDetail);
-    await setField(
-      page,
-      '[data-field="evidence"]',
-      `Evidência automatizada Playwright ${String(index + 1).padStart(2, "0")}`,
-      journeyDetail
-    );
-    await journeyDetail.locator('[data-field="status"]').selectOption("Aprovado");
+    for (let index = 0; index < group.count; index += 1) {
+      approvedIndex += 1;
+      await page.locator(".journey-line").nth(index).click();
+
+      const drawer = page.locator("#scenarioDrawer");
+      const journeyDetail = page.locator("#journeyDetail");
+      await expect(drawer).toHaveClass(/open/);
+
+      await setField(page, '[data-field="owner"]', "QA Sign-off", journeyDetail);
+      await setField(page, '[data-field="date"]', "2026-05-14", journeyDetail);
+      await setField(
+        page,
+        '[data-field="evidence"]',
+        `Evidencia automatizada Playwright ${String(approvedIndex).padStart(2, "0")}`,
+        journeyDetail
+      );
+      await journeyDetail.locator('[data-set-status="Aprovado"]').click();
+
+      if (approvedIndex === 1) {
+        await screenshot(page, "03-sidebar-aprovacao");
+      }
+
+      await journeyDetail.locator('[data-action="close-drawer"]').click();
+      await expect(drawer).not.toHaveClass(/open/);
+    }
   }
 
   await expect(page.locator(".metric-card").filter({ hasText: "Progresso" })).toContainText("100%");
-  await screenshot(page, "01-jornada-aprovada");
+  await screenshot(page, "04-jornada-aprovada");
 
-  await page.getByRole("button", { name: "Kanban" }).click();
-  await expect(page.locator(".kanban-column.done .kanban-card")).toHaveCount(32);
-  await expect(page.locator(".kanban-column.issue .kanban-card")).toHaveCount(0);
-  await screenshot(page, "02-kanban-aprovado");
+  await page.locator('[data-view-mode="kanban"]').click();
+  await expect(page.locator(".journey-kanban .kanban-column.done .kanban-card")).toHaveCount(11);
+  await expect(page.locator(".journey-kanban .kanban-column.issue .kanban-card")).toHaveCount(0);
+  await screenshot(page, "05-jornada-kanban-aprovado");
 
   await page.getByRole("button", { name: "Pendências" }).click();
   await expect(page.locator("#issuesList")).toContainText("Nenhuma pendência registrada");
-  await screenshot(page, "03-pendencias-sem-itens");
+  await screenshot(page, "06-pendencias-sem-itens");
 
   await page.locator('[data-tab="report"]').click();
   await page.getByRole("button", { name: "Adicionar assinatura" }).click();
@@ -72,7 +95,7 @@ test("aprova todos os cenários e gera pacote de evidências", async ({ page }) 
   await setField(page, '[data-field="role"]', "Responsável pela validação", reportPanel);
   await setField(page, '[data-field="date"]', "2026-05-14", reportPanel);
   await setField(page, '[data-field="notes"]', "Aprovação automatizada para teste da ferramenta.", reportPanel);
-  await screenshot(page, "04-relatorio-assinatura");
+  await screenshot(page, "07-relatorio-assinatura");
 
   const exportedState = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), STORAGE_KEY);
   const scenarioValues = Object.values(exportedState.scenarios);

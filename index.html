@@ -65,7 +65,6 @@
       <section class="workspace">
         <nav class="tabs" aria-label="Seções do sign-off">
           <button type="button" class="tab active" data-tab="journey">Jornada</button>
-          <button type="button" class="tab" data-tab="kanban">Kanban</button>
           <button type="button" class="tab" data-tab="issues">Pendências</button>
           <button type="button" class="tab" data-tab="report">Relatório</button>
         </nav>
@@ -76,21 +75,14 @@
               <h2>Jornada de aceite</h2>
               <p>Prepare a entrega, valide a operação e registre o aceite final.</p>
             </div>
+            <div class="view-switch" id="journeyViewToggle" aria-label="Visualização da jornada">
+              <button type="button" class="view-toggle active" data-view-mode="lines">Linhas</button>
+              <button type="button" class="view-toggle" data-view-mode="kanban">Kanban</button>
+            </div>
           </div>
           <div class="summary-grid compact" id="journeySummary"></div>
           <div class="journey-steps" id="journeySteps"></div>
           <div class="journey-lines" id="journeyLines"></div>
-          <div class="simple-detail" id="journeyDetail"></div>
-        </section>
-
-        <section class="tab-panel" id="kanbanPanel">
-          <div class="section-title-row">
-            <div>
-              <h2>Kanban de validação</h2>
-              <p>Arraste mentalmente a entrega pelo status: comece pelos bloqueios e feche os aprovados.</p>
-            </div>
-          </div>
-          <div class="kanban-board" id="kanbanBoard"></div>
         </section>
 
         <section class="tab-panel" id="issuesPanel">
@@ -118,6 +110,11 @@
         </section>
       </section>
     </main>
+
+    <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+    <aside class="scenario-drawer" id="scenarioDrawer" aria-hidden="true" aria-label="Editor de cenário">
+      <div class="drawer-content" id="journeyDetail"></div>
+    </aside>
 
     <template id="signatureTemplate">
       <article class="signature-card">

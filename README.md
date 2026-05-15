@@ -25,11 +25,12 @@ npx serve .
 ## Funcionalidades
 
 - Jornada simplificada em 3 blocos no topo: dados iniciais, operação principal, apoio e integrações.
-- Linhas de cenários aparecem abaixo conforme o bloco escolhido, mantendo a edição rápida no mesmo fluxo.
+- Visualização alternável entre Linhas e Kanban dentro da Jornada.
+- Clique em qualquer cenário abre um sidebar largo para aprovar, reprovar, bloquear, registrar evidência e pendência.
 - Visual mais leve, colorido e com ícones SVG.
-- Kanban por status para acompanhar a validação.
+- Kanban por status filtrado pelo bloco selecionado.
 - Dashboard reduzido com progresso, aprovados, pendências e assinaturas.
-- Execução rápida com objetivo, passos, resultado esperado, status, evidência e pendência.
+- Execução rápida no sidebar com objetivo, passos, resultado esperado, status, evidência e pendência.
 - Controle de status: `Não iniciado`, `Em teste`, `Aprovado`, `Reprovado`, `Bloqueado`, `N/A`.
 - Lista de pendências por severidade e responsável.
 - Assinaturas de aceite por área.

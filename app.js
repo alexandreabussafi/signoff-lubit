@@ -756,6 +756,8 @@ const processGroups = [
 let state = loadState();
 let selectedScenarioId = getAllScenarios()[0].scenario.id;
 let selectedProcessGroupId = processGroups[0].id;
+let journeyViewMode = "lines";
+let isDrawerOpen = false;
 
 const els = {
   projectName: document.getElementById("projectName"),
@@ -767,8 +769,10 @@ const els = {
   journeySummary: document.getElementById("journeySummary"),
   journeySteps: document.getElementById("journeySteps"),
   journeyLines: document.getElementById("journeyLines"),
+  journeyViewToggle: document.getElementById("journeyViewToggle"),
   journeyDetail: document.getElementById("journeyDetail"),
-  kanbanBoard: document.getElementById("kanbanBoard"),
+  drawerBackdrop: document.getElementById("drawerBackdrop"),
+  scenarioDrawer: document.getElementById("scenarioDrawer"),
   reportSummary: document.getElementById("reportSummary"),
   issuesList: document.getElementById("issuesList"),
   signaturesList: document.getElementById("signaturesList"),
@@ -877,7 +881,6 @@ function render() {
   bindProjectFields();
   renderFilters();
   renderJourney();
-  renderKanban();
   renderIssues();
   renderReport();
   renderSignatures();
@@ -925,6 +928,9 @@ function renderJourney() {
   if (!processGroups.some((group) => group.id === selectedProcessGroupId)) {
     selectedProcessGroupId = processGroups[0].id;
   }
+  els.journeyViewToggle.querySelectorAll("[data-view-mode]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.viewMode === journeyViewMode);
+  });
   els.journeySteps.innerHTML = processGroups.map(renderJourneyGroup).join("");
   renderJourneyLines();
   renderSimpleScenarioDetail();
@@ -969,6 +975,13 @@ function renderJourneyLines() {
   const group = processGroups.find((item) => item.id === selectedProcessGroupId) || processGroups[0];
   const filtered = getFilteredScenarios().filter(({ process }) => group.processIds.includes(process.id));
   const allInGroup = getAllScenarios().filter(({ process }) => group.processIds.includes(process.id));
+  const selectedInGroup = allInGroup.some(({ scenario }) => scenario.id === selectedScenarioId);
+
+  if (!selectedInGroup && filtered.length) {
+    selectedScenarioId =
+      filtered.find(({ scenario }) => !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status))?.scenario.id ||
+      filtered[0].scenario.id;
+  }
 
   if (!filtered.length) {
     els.journeyLines.innerHTML = `
@@ -986,23 +999,21 @@ function renderJourneyLines() {
     return;
   }
 
-  const selectedInGroup = allInGroup.some(({ scenario }) => scenario.id === selectedScenarioId);
-  if (!selectedInGroup) {
-    selectedScenarioId =
-      filtered.find(({ scenario }) => !["Aprovado", "N/A"].includes(state.scenarios[scenario.id].status))?.scenario.id ||
-      filtered[0].scenario.id;
+  if (journeyViewMode === "kanban") {
+    els.journeyLines.innerHTML = `
+      <section class="journey-line-panel ${group.color}">
+        ${journeyPanelHeader(group, filtered.length, allInGroup.length)}
+        <div class="journey-kanban-wrap">
+          ${renderKanbanBoard(filtered, "journey-kanban")}
+        </div>
+      </section>
+    `;
+    return;
   }
 
   els.journeyLines.innerHTML = `
     <section class="journey-line-panel ${group.color}">
-      <header class="journey-line-header">
-        <div>
-          <p class="eyebrow">${group.shortTitle}</p>
-          <h3>${group.title}</h3>
-          <span>${filtered.length}/${allInGroup.length} cenário(s) nesta visão</span>
-        </div>
-        <span class="journey-line-icon">${renderIcon(group.icon)}</span>
-      </header>
+      ${journeyPanelHeader(group, filtered.length, allInGroup.length)}
       <div class="journey-line-list">
         ${filtered
           .map(({ feature, scenario }, index) => {
@@ -1026,7 +1037,20 @@ function renderJourneyLines() {
   `;
 }
 
-function renderKanban() {
+function journeyPanelHeader(group, visibleCount, totalCount) {
+  return `
+    <header class="journey-line-header">
+      <div>
+        <p class="eyebrow">${group.shortTitle}</p>
+        <h3>${group.title}</h3>
+        <span>${visibleCount}/${totalCount} cenário(s) nesta visão</span>
+      </div>
+      <span class="journey-line-icon">${renderIcon(group.icon)}</span>
+    </header>
+  `;
+}
+
+function renderKanbanBoard(rows, extraClass = "") {
   const columns = [
     { id: "todo", title: "Não iniciado", icon: "circle", match: (data) => data.status === "Não iniciado" },
     { id: "testing", title: "Em teste", icon: "timer", match: (data) => data.status === "Em teste" },
@@ -1034,11 +1058,10 @@ function renderKanban() {
     { id: "issue", title: "Pendência", icon: "alert", match: (data) => ["Reprovado", "Bloqueado"].includes(data.status) || Boolean(data.issues.trim()) },
     { id: "na", title: "N/A", icon: "minus", match: (data) => data.status === "N/A" },
   ];
-  const filtered = getFilteredScenarios();
 
-  els.kanbanBoard.innerHTML = columns
+  return `<div class="kanban-board ${extraClass}">${columns
     .map((column) => {
-      const cards = filtered.filter(({ scenario }) => column.match(state.scenarios[scenario.id]));
+      const cards = rows.filter(({ scenario }) => column.match(state.scenarios[scenario.id]));
       return `
         <section class="kanban-column ${column.id}">
           <header>
@@ -1067,7 +1090,11 @@ function renderKanban() {
         </section>
       `;
     })
-    .join("");
+    .join("")}</div>`;
+}
+
+function renderKanban() {
+  return renderKanbanBoard(getFilteredScenarios());
 }
 
 function renderReport() {
@@ -1114,8 +1141,8 @@ function renderReport() {
 
 function renderSimpleScenarioDetail() {
   const selected = getAllScenarios().find((item) => item.scenario.id === selectedScenarioId);
-  if (!selected) {
-    els.journeyDetail.innerHTML = `<div class="empty-state">Selecione um cenário no Kanban ou na Jornada.</div>`;
+  if (!isDrawerOpen || !selected) {
+    closeScenarioDrawer(false);
     return;
   }
 
@@ -1123,17 +1150,26 @@ function renderSimpleScenarioDetail() {
   const meta = getScenarioMeta(selected.process, selected.feature, selected.scenario);
   const group = getProcessGroup(selected.process.id);
 
+  openScenarioDrawer(false);
   els.journeyDetail.innerHTML = `
-    <article class="scenario-focus ${group.color}">
-      <div class="scenario-focus-header">
+    <article class="drawer-scenario ${group.color}" data-scenario-form="${selected.scenario.id}">
+      <header class="drawer-header">
         <span class="scenario-focus-icon">${renderIcon(group.icon)}</span>
         <div>
           <p class="eyebrow">${group.shortTitle} / ${selected.feature.name}</p>
           <h2>${selected.scenario.name}</h2>
         </div>
         <span class="status-pill ${statusClass(data.status)}">${data.status}</span>
+        <button type="button" class="icon-button" data-action="close-drawer" aria-label="Fechar editor">${renderIcon("x")}</button>
+      </header>
+      <div class="quick-status-actions" aria-label="Ações rápidas de status">
+        <button type="button" class="quick-status approve" data-set-status="Aprovado">${renderIcon("check")} Aprovar</button>
+        <button type="button" class="quick-status testing" data-set-status="Em teste">${renderIcon("timer")} Em teste</button>
+        <button type="button" class="quick-status reject" data-set-status="Reprovado">${renderIcon("alert")} Reprovar</button>
+        <button type="button" class="quick-status block" data-set-status="Bloqueado">${renderIcon("shield")} Bloquear</button>
+        <button type="button" class="quick-status neutral" data-set-status="N/A">${renderIcon("minus")} N/A</button>
       </div>
-      <div class="focus-grid">
+      <div class="focus-grid drawer-route">
         <section>
           <h3>Objetivo</h3>
           <p>${selected.scenario.acceptance}</p>
@@ -1149,7 +1185,7 @@ function renderSimpleScenarioDetail() {
           ${selected.scenario.steps.map((step) => `<li>${step}</li>`).join("")}
         </ol>
       </section>
-      <div class="detail-grid" data-scenario-form="${selected.scenario.id}">
+      <div class="detail-grid drawer-form" data-scenario-form="${selected.scenario.id}">
         <label>
           Status
           <select data-field="status">
@@ -1164,6 +1200,19 @@ function renderSimpleScenarioDetail() {
           Data
           <input data-field="date" type="date">
         </label>
+        <label>
+          Severidade
+          <select data-field="severity">
+            <option>Baixa</option>
+            <option>Média</option>
+            <option>Alta</option>
+            <option>Crítica</option>
+          </select>
+        </label>
+        <label class="full-width">
+          Ambiente testado
+          <input data-field="environment" type="text">
+        </label>
         <label class="full-width">
           Evidência
           <textarea data-field="evidence" rows="2" placeholder="Link, print, arquivo ou observação"></textarea>
@@ -1172,6 +1221,10 @@ function renderSimpleScenarioDetail() {
           Pendência
           <textarea data-field="issues" rows="2" placeholder="Descreva somente se houver bloqueio ou ressalva"></textarea>
         </label>
+        <label class="full-width">
+          Observações
+          <textarea data-field="notes" rows="2" placeholder="Contexto, ressalva ou orientação para o aceite"></textarea>
+        </label>
       </div>
     </article>
   `;
@@ -1179,6 +1232,28 @@ function renderSimpleScenarioDetail() {
   els.journeyDetail.querySelectorAll("[data-field]").forEach((field) => {
     field.value = data[field.dataset.field] || "";
   });
+}
+
+function openScenarioDrawer(renderNow = true) {
+  isDrawerOpen = true;
+  els.drawerBackdrop.hidden = false;
+  els.drawerBackdrop.classList.add("open");
+  els.scenarioDrawer.classList.add("open");
+  els.scenarioDrawer.setAttribute("aria-hidden", "false");
+  if (renderNow) renderSimpleScenarioDetail();
+}
+
+function closeScenarioDrawer(renderNow = true) {
+  isDrawerOpen = false;
+  els.drawerBackdrop.classList.remove("open");
+  els.scenarioDrawer.classList.remove("open");
+  els.scenarioDrawer.setAttribute("aria-hidden", "true");
+  window.setTimeout(() => {
+    if (!isDrawerOpen) els.drawerBackdrop.hidden = true;
+  }, 180);
+  if (renderNow) {
+    els.journeyDetail.innerHTML = "";
+  }
 }
 
 function metricCard(iconName, value, label) {
@@ -1212,6 +1287,7 @@ function renderIcon(name) {
     file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>',
     markdown: '<path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M6 15V9l3 3 3-3v6"/><path d="M15 9v6"/><path d="m18 12-3 3-3-3"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   };
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || icons.circle}</svg>`;
 }
@@ -1628,7 +1704,6 @@ function updateScenario(id, field, value) {
   state.scenarios[id][field] = value;
   persist();
   renderJourney();
-  renderKanban();
   renderIssues();
   renderReport();
 }
@@ -1965,6 +2040,13 @@ document.querySelectorAll(".tab").forEach((tab) => {
   field.addEventListener("input", render);
 });
 
+els.journeyViewToggle.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-view-mode]");
+  if (!button) return;
+  journeyViewMode = button.dataset.viewMode;
+  renderJourney();
+});
+
 document.body.addEventListener("click", (event) => {
   const scenarioButton = event.target.closest("[data-select-scenario]");
   if (scenarioButton) {
@@ -1973,6 +2055,7 @@ document.body.addEventListener("click", (event) => {
     if (selected) {
       selectedProcessGroupId = getProcessGroup(selected.process.id).id;
     }
+    isDrawerOpen = true;
     document.querySelector('[data-tab="journey"]').click();
     renderJourney();
     return;
@@ -1992,7 +2075,21 @@ document.body.addEventListener("click", (event) => {
     if (next) {
       selectedScenarioId = next.scenario.id;
     }
+    closeScenarioDrawer();
     renderJourney();
+    return;
+  }
+
+  const statusButton = event.target.closest("[data-set-status]");
+  if (statusButton) {
+    const form = event.target.closest("[data-scenario-form]");
+    if (!form) return;
+    updateScenario(form.dataset.scenarioForm, "status", statusButton.dataset.setStatus);
+    return;
+  }
+
+  if (event.target.closest('[data-action="close-drawer"]')) {
+    closeScenarioDrawer();
     return;
   }
 
@@ -2003,6 +2100,21 @@ document.body.addEventListener("click", (event) => {
     renderJourney();
     renderReport();
     renderSignatures();
+  }
+});
+
+els.drawerBackdrop.addEventListener("click", () => closeScenarioDrawer());
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && isDrawerOpen) {
+    closeScenarioDrawer();
+    return;
+  }
+
+  const groupButton = event.target.closest?.("[data-select-group]");
+  if (groupButton && ["Enter", " "].includes(event.key)) {
+    event.preventDefault();
+    groupButton.click();
   }
 });
 

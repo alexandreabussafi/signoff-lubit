@@ -8,7 +8,7 @@ Ela não substitui o Lubit. Ela organiza o aceite da implantação.
 
 ## Jornada Recomendada
 
-Use a aba **Jornada** como tela principal. Os três cards superiores funcionam como headers da etapa; ao escolher um card, as linhas de cenários aparecem logo abaixo para edição rápida.
+Use a aba **Jornada** como tela principal. Os três cards superiores funcionam como headers da etapa; ao escolher um card, os cenários aparecem logo abaixo em **Linhas** ou **Kanban**.
 
 1. **Preparar a entrega**
    - Valide ambiente, usuários, permissões, cadastros, plano migrado e árvore de ativos.
@@ -34,18 +34,19 @@ Use a aba **Jornada** como tela principal. Os três cards superiores funcionam c
 
 ## Como Registrar Um Teste
 
-1. Abra **Jornada** ou **Kanban**.
-2. Clique em um cenário.
-3. Leia objetivo, passos e resultado esperado.
-4. Preencha responsável, data e evidência.
-5. Altere o status.
-6. Se houver problema, preencha o campo de pendência.
+1. Abra **Jornada**.
+2. Escolha um bloco superior.
+3. Escolha a visão **Linhas** ou **Kanban**.
+4. Clique em um cenário para abrir o sidebar de edição.
+5. Leia objetivo, passos e resultado esperado.
+6. Use uma ação rápida de status ou preencha o status manualmente.
+7. Preencha responsável, data, evidência e pendência quando houver.
 
 ## Kanban
 
-A aba **Kanban** mostra os cenários por status.
+O **Kanban** fica dentro da Jornada e mostra os cenários por status no bloco selecionado.
 
-Use essa tela para acompanhar rapidamente:
+Use essa visão para acompanhar rapidamente:
 
 - o que ainda não começou;
 - o que está em teste;
