@@ -5,145 +5,417 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Treinamento de Uso - Lubit Sign-off</title>
     <style>
+      :root {
+        --bg: #f3f6fa;
+        --surface: #ffffff;
+        --surface-alt: #f8fafc;
+        --line: #d8e0e7;
+        --text: #1d252c;
+        --muted: #5f6f7d;
+        --teal: #0f766e;
+        --teal-soft: #e6f6f3;
+        --blue: #2563eb;
+        --blue-soft: #eaf1ff;
+        --violet: #7c3aed;
+        --violet-soft: #f2ebff;
+        --orange: #f97316;
+        --orange-soft: #fff4e8;
+        --pink: #db2777;
+        --pink-soft: #fff0f7;
+        --green: #217044;
+        --green-soft: #ecfdf3;
+        --red: #ad3232;
+        --red-soft: #fff1f2;
+        --shadow: 0 10px 30px rgba(30, 43, 54, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
       body {
         margin: 0;
-        background: #f6f8fb;
-        color: #1d252c;
+        background:
+          linear-gradient(180deg, rgba(15, 118, 110, 0.08) 0, rgba(37, 99, 235, 0.05) 260px, transparent 520px),
+          var(--bg);
+        color: var(--text);
         font-family: Arial, Helvetica, sans-serif;
         line-height: 1.55;
       }
+
       main {
-        max-width: 920px;
+        max-width: 1120px;
         margin: 0 auto;
-        padding: 32px 20px 56px;
+        padding: 28px 20px 56px;
       }
-      article {
-        background: #fff;
-        border: 1px solid #d8e0e7;
-        border-radius: 10px;
-        padding: 28px;
-        box-shadow: 0 2px 10px rgba(30, 43, 54, 0.06);
+
+      .shell {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
       }
-      h1 {
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 24px;
+        align-items: center;
+        padding: 30px;
+        border-top: 6px solid var(--teal);
+        background:
+          linear-gradient(135deg, #ffffff 0%, #f8fbff 58%, var(--teal-soft) 100%);
+      }
+
+      .eyebrow {
         margin: 0 0 8px;
-        font-size: 28px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
       }
+
+      h1, h2, h3, p { margin-top: 0; }
+
+      h1 {
+        margin-bottom: 10px;
+        font-size: clamp(30px, 4vw, 44px);
+        line-height: 1.08;
+      }
+
       h2 {
-        margin-top: 28px;
-        padding-top: 18px;
-        border-top: 1px solid #d8e0e7;
-        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 14px;
+        font-size: 22px;
       }
+
       h3 {
         margin-bottom: 6px;
-        color: #176b62;
+        font-size: 16px;
       }
+
+      .lead {
+        margin-bottom: 0;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 17px;
+      }
+
+      .hero-card {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+        border: 1px solid rgba(15, 118, 110, 0.22);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .hero-card strong {
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .hero-card span {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .content {
+        display: grid;
+        gap: 22px;
+        padding: 26px 30px 32px;
+      }
+
+      .section {
+        padding-top: 4px;
+      }
+
+      .icon {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
+        color: currentColor;
+      }
+
+      .icon-box {
+        display: inline-grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--teal-soft);
+        color: var(--teal);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        display: grid;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--teal);
+        border-radius: 10px;
+        background: var(--surface-alt);
+        padding: 14px;
+      }
+
+      .step.blue { border-top-color: var(--blue); }
+      .step.violet { border-top-color: var(--violet); }
+
+      .step .icon-box { background: var(--teal-soft); color: var(--teal); }
+      .step.blue .icon-box { background: var(--blue-soft); color: var(--blue); }
+      .step.violet .icon-box { background: var(--violet-soft); color: var(--violet); }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .status {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .status i {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--surface-alt);
+        color: var(--muted);
+        font-style: normal;
+        font-weight: 800;
+      }
+
+      .status.testing i { background: var(--orange-soft); color: var(--orange); }
+      .status.done i { background: var(--green-soft); color: var(--green); }
+      .status.issue i { background: var(--red-soft); color: var(--red); }
+      .status.block i { background: var(--violet-soft); color: var(--violet); }
+      .status.na i { background: var(--blue-soft); color: var(--blue); }
+
+      .flow {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 14px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface-alt);
+        padding: 16px;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .checklist li {
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+      }
+
+      .checklist span {
+        display: grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        border-radius: 7px;
+        background: var(--teal-soft);
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .callout {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid rgba(249, 115, 22, 0.28);
+        border-radius: 10px;
+        background: var(--orange-soft);
+      }
+
+      .exports {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .export-card {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: 14px;
+      }
+
+      .export-card.html { border-top: 4px solid var(--blue); }
+      .export-card.md { border-top: 4px solid var(--violet); }
+      .export-card.json { border-top: 4px solid var(--orange); }
+
       code {
         background: #eef2f5;
         border-radius: 6px;
         padding: 2px 5px;
       }
-      .lead {
-        color: #65727e;
-        font-size: 16px;
-      }
-      .steps {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-      }
-      .step {
-        border-left: 4px solid #176b62;
-        background: #fbfcfd;
-        border-radius: 8px;
-        padding: 12px;
-      }
-      @media (max-width: 760px) {
-        .steps {
+
+      @media (max-width: 860px) {
+        .hero,
+        .flow,
+        .steps,
+        .status-grid,
+        .exports {
           grid-template-columns: 1fr;
         }
+
+        .hero {
+          padding: 24px;
+        }
+
+        .content {
+          padding: 22px;
+        }
       }
+
       @media print {
-        body {
-          background: #fff;
-        }
-        article {
-          box-shadow: none;
-          border: 0;
-        }
+        body { background: #fff; }
+        main { padding: 0; }
+        .shell { border: 0; box-shadow: none; }
       }
     </style>
   </head>
   <body>
-    <main>
-      <article>
-        <h1>Treinamento de Uso - Lubit Sign-off</h1>
-        <p class="lead">Ferramenta para validar a entrega do sistema, registrar evidências, controlar pendências e gerar o pacote final de aceite.</p>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-box" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 7.5v9L12 21v-9M21 7.5v9L12 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-plug" viewBox="0 0 24 24"><path d="M12 22v-5M9 8V2M15 8V2M7 8h10v4a5 5 0 0 1-10 0V8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 2v6h6M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v4M12 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    </svg>
 
-        <h2>Jornada Recomendada</h2>
-        <p>Use os três cards superiores como headers da etapa. Ao escolher um card, os cenários aparecem logo abaixo em Linhas ou Kanban.</p>
-        <div class="steps">
-          <section class="step">
-            <h3>1. Preparar a entrega</h3>
-            <p>Valide ambiente, usuários, permissões, cadastros, plano migrado e árvore de ativos.</p>
+    <main>
+      <article class="shell">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Treinamento assistido</p>
+            <h1>Lubit Sign-off</h1>
+            <p class="lead">Roteiro prático para validar a entrega, registrar evidências, controlar pendências e gerar o pacote final de aceite.</p>
+          </div>
+          <aside class="hero-card">
+            <span>Jornada de aceite</span>
+            <strong>3 etapas</strong>
+            <span>Preparação, operação e assinatura final em um fluxo simples.</span>
+          </aside>
+        </header>
+
+        <div class="content">
+          <section class="section">
+            <h2><span class="icon-box"><svg class="icon"><use href="#icon-check"/></svg></span>Jornada recomendada</h2>
+            <p>Use a aba <strong>Jornada</strong> como tela principal. Escolha um bloco superior e alterne entre <strong>Linhas</strong> ou <strong>Kanban</strong> para executar o aceite.</p>
+            <div class="steps">
+              <section class="step">
+                <span class="icon-box"><svg class="icon"><use href="#icon-box"/></svg></span>
+                <h3>1. Preparar a entrega</h3>
+                <p>Valide ambiente, usuários, permissões, cadastros, plano migrado e árvore de ativos.</p>
+              </section>
+              <section class="step blue">
+                <span class="icon-box"><svg class="icon"><use href="#icon-wrench"/></svg></span>
+                <h3>2. Validar a operação</h3>
+                <p>Execute plano, OS, retorno, extraordinária, nota técnica, parada preventiva e estoque.</p>
+              </section>
+              <section class="step violet">
+                <span class="icon-box"><svg class="icon"><use href="#icon-plug"/></svg></span>
+                <h3>3. Assinar o aceite</h3>
+                <p>Revise integrações, relatórios, logs, mapas, pendências e assinaturas por área.</p>
+              </section>
+            </div>
           </section>
-          <section class="step">
-            <h3>2. Validar a operação</h3>
-            <p>Execute tarefas CIT, geração de OS, retorno, OS extraordinária, nota técnica, parada preventiva e estoque.</p>
+
+          <section class="section">
+            <h2><span class="icon-box"><svg class="icon"><use href="#icon-file"/></svg></span>Como registrar um teste</h2>
+            <div class="flow">
+              <div class="panel">
+                <ol class="checklist">
+                  <li><span>1</span><div>Abra <strong>Jornada</strong> e selecione o bloco que será validado.</div></li>
+                  <li><span>2</span><div>Escolha <strong>Linhas</strong> para execução rápida ou <strong>Kanban</strong> para acompanhar por status.</div></li>
+                  <li><span>3</span><div>Clique em um cenário para abrir o sidebar de edição.</div></li>
+                  <li><span>4</span><div>Leia objetivo, passos e resultado esperado antes de preencher.</div></li>
+                  <li><span>5</span><div>Use uma ação rápida de status e registre responsável, data, evidência e pendência quando houver.</div></li>
+                </ol>
+              </div>
+              <aside class="callout">
+                <span class="icon-box" style="background:var(--orange-soft);color:var(--orange)"><svg class="icon"><use href="#icon-alert"/></svg></span>
+                <div>
+                  <h3>Regra de ouro</h3>
+                  <p>Não aprove cenário sem evidência. O JSON exportado funciona como backup e pacote oficial do aceite.</p>
+                </div>
+              </aside>
+            </div>
           </section>
-          <section class="step">
-            <h3>3. Assinar o aceite</h3>
-            <p>Revise importações, SAP, relatórios, logs, mapas, pendências e assinaturas.</p>
+
+          <section class="section">
+            <h2><span class="icon-box"><svg class="icon"><use href="#icon-check"/></svg></span>Status dos cenários</h2>
+            <div class="status-grid">
+              <div class="status"><i>0</i><div><strong>Não iniciado</strong><br>Ainda não testado.</div></div>
+              <div class="status testing"><i>T</i><div><strong>Em teste</strong><br>Execução em andamento.</div></div>
+              <div class="status done"><i>A</i><div><strong>Aprovado</strong><br>Validado com evidência suficiente.</div></div>
+              <div class="status issue"><i>R</i><div><strong>Reprovado</strong><br>Comportamento incorreto encontrado.</div></div>
+              <div class="status block"><i>B</i><div><strong>Bloqueado</strong><br>Não foi possível testar por dependência externa.</div></div>
+              <div class="status na"><i>N</i><div><strong>N/A</strong><br>Não aplicável ao projeto.</div></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2><span class="icon-box"><svg class="icon"><use href="#icon-file"/></svg></span>Relatório e exportações</h2>
+            <div class="exports">
+              <section class="export-card html">
+                <h3>Relatório HTML</h3>
+                <p>Documento formal para impressão, PDF e reunião de sign-off.</p>
+              </section>
+              <section class="export-card md">
+                <h3>Markdown</h3>
+                <p>Versão editável do aceite para documentação complementar.</p>
+              </section>
+              <section class="export-card json">
+                <h3>JSON</h3>
+                <p>Backup do preenchimento e pacote oficial de continuidade.</p>
+              </section>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2><span class="icon-box"><svg class="icon"><use href="#icon-alert"/></svg></span>Boas práticas</h2>
+            <ul>
+              <li>Mantenha comentários curtos, objetivos e úteis para decisão.</li>
+              <li>Revise pendências antes de adicionar assinaturas finais.</li>
+              <li>Exporte o JSON ao final de cada sessão de validação.</li>
+              <li>Gere o relatório final somente depois de revisar pendências e ressalvas.</li>
+            </ul>
           </section>
         </div>
-
-        <h2>Status dos Cenários</h2>
-        <ul>
-          <li><strong>Não iniciado:</strong> ainda não testado.</li>
-          <li><strong>Em teste:</strong> execução em andamento.</li>
-          <li><strong>Aprovado:</strong> validado com evidência suficiente.</li>
-          <li><strong>Reprovado:</strong> comportamento incorreto encontrado.</li>
-          <li><strong>Bloqueado:</strong> não foi possível testar por dependência externa.</li>
-          <li><strong>N/A:</strong> não aplicável ao projeto.</li>
-        </ul>
-
-        <h2>Como Registrar Um Teste</h2>
-        <ol>
-          <li>Abra <strong>Jornada</strong>.</li>
-          <li>Escolha um bloco superior.</li>
-          <li>Escolha a visão <strong>Linhas</strong> ou <strong>Kanban</strong>.</li>
-          <li>Clique em um cenário para abrir o sidebar de edição.</li>
-          <li>Leia objetivo, passos e resultado esperado.</li>
-          <li>Use uma ação rápida de status ou preencha o status manualmente.</li>
-          <li>Preencha responsável, data, evidência e pendência quando houver.</li>
-        </ol>
-
-        <h2>Kanban</h2>
-        <p>O Kanban fica dentro da <strong>Jornada</strong> e é filtrado pelo bloco selecionado. Ele mostra rapidamente o que ainda não começou, o que está em teste, o que foi aprovado, o que tem pendência e o que é N/A.</p>
-
-        <h2>Pendências</h2>
-        <p>A aba <strong>Pendências</strong> reúne automaticamente cenários reprovados, bloqueados ou com descrição de defeito. Antes do sign-off final, revise essa tela e decida se o item será corrigido, aceito com ressalva, marcado como N/A ou mantido como bloqueio.</p>
-
-        <h2>Relatório e Assinaturas</h2>
-        <ol>
-          <li>Revise o progresso do pacote.</li>
-          <li>Adicione assinaturas por área.</li>
-          <li>Gere o relatório HTML.</li>
-          <li>Exporte Markdown se precisar de versão editável.</li>
-          <li>Exporte JSON para backup e continuidade do aceite.</li>
-        </ol>
-
-        <h2>Exportar e Importar JSON</h2>
-        <p>O app salva dados no navegador. Use <strong>Exportar JSON</strong> ao final de cada sessão e <strong>Importar JSON</strong> para continuar em outro navegador ou computador.</p>
-
-        <h2>Boas Práticas</h2>
-        <ul>
-          <li>Não aprove cenário sem evidência.</li>
-          <li>Use comentários curtos e objetivos.</li>
-          <li>Mantenha uma assinatura por área participante.</li>
-          <li>Exporte o JSON antes de limpar o preenchimento.</li>
-          <li>Gere o relatório final somente após revisar pendências.</li>
-        </ul>
       </article>
     </main>
   </body>

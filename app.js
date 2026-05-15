@@ -1841,47 +1841,68 @@ function generateReport() {
         <meta charset="utf-8">
         <title>Relatório de Sign-off Lubit</title>
         <style>
-          body { font-family: Arial, Helvetica, sans-serif; color: #1d252c; margin: 0; background: #f6f8fb; }
-          .report-shell { max-width: 1180px; margin: 24px auto; background: #fff; border: 1px solid #d8e0e7; border-radius: 10px; padding: 28px; box-shadow: 0 8px 28px rgba(30,43,54,.08); }
-          .cover { border-top: 6px solid #176b62; padding-top: 16px; }
-          h1 { margin-bottom: 4px; font-size: 30px; }
-          h2 { margin-top: 28px; border-bottom: 1px solid #d8e0e7; padding-bottom: 6px; }
-          table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
-          th, td { border: 1px solid #d8e0e7; padding: 8px; text-align: left; vertical-align: top; }
+          :root { color-scheme: light; }
+          * { box-sizing: border-box; }
+          body { font-family: Arial, Helvetica, sans-serif; color: #1d252c; margin: 0; background: linear-gradient(180deg, rgba(15,118,110,.08), rgba(37,99,235,.04) 360px, #f6f8fb 720px); }
+          .report-shell { max-width: 1180px; margin: 24px auto; background: #fff; border: 1px solid #d8e0e7; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 34px rgba(30,43,54,.1); }
+          .report-body { padding: 26px 28px 30px; }
+          .cover { display: grid; grid-template-columns: minmax(0,1fr) 240px; gap: 18px; align-items: center; padding: 28px; border-top: 7px solid #0f766e; background: linear-gradient(135deg, #fff, #f8fbff 58%, #e6f6f3); }
+          .cover-card { border: 1px solid rgba(15,118,110,.22); border-radius: 10px; background: rgba(255,255,255,.75); padding: 14px; }
+          .cover-card strong { display: block; font-size: 28px; line-height: 1; }
+          h1 { margin: 0 0 6px; font-size: 32px; line-height: 1.12; }
+          h2 { display: flex; align-items: center; gap: 8px; margin-top: 28px; border-bottom: 1px solid #d8e0e7; padding-bottom: 8px; font-size: 20px; }
+          h3 { color: #176b62; margin: 18px 0 8px; }
+          table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 12px 0 20px; font-size: 13px; border: 1px solid #d8e0e7; border-radius: 8px; overflow: hidden; }
+          th, td { border-bottom: 1px solid #d8e0e7; padding: 9px 10px; text-align: left; vertical-align: top; }
+          tr:last-child td { border-bottom: 0; }
           th { background: #eef2f5; color: #425466; text-transform: uppercase; font-size: 11px; }
           .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0 18px; }
-          .kpi { border: 1px solid #d8e0e7; border-top: 4px solid #176b62; border-radius: 8px; padding: 12px; background: #fbfcfd; }
+          .kpi { display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 10px; align-items: center; border: 1px solid #d8e0e7; border-top: 4px solid #0f766e; border-radius: 9px; padding: 12px; background: #fbfcfd; }
           .kpi:nth-child(2) { border-top-color: #217044; }
           .kpi:nth-child(3) { border-top-color: #f97316; }
           .kpi:nth-child(4) { border-top-color: #7c3aed; }
           .kpi strong { display: block; font-size: 24px; }
           .kpi span { color: #65727e; font-size: 12px; font-weight: 700; }
+          .icon, .title-icon svg { width: 19px; height: 19px; }
+          .kpi-icon, .title-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: #e6f6f3; color: #0f766e; }
+          .kpi:nth-child(2) .kpi-icon { background: #ecfdf3; color: #217044; }
+          .kpi:nth-child(3) .kpi-icon { background: #fff4e8; color: #f97316; }
+          .kpi:nth-child(4) .kpi-icon { background: #f2ebff; color: #7c3aed; }
           .meta { color: #65727e; }
-          .status { font-weight: 700; }
-          @media print { body { background: #fff; } .report-shell { margin: 0; border: 0; box-shadow: none; padding: 0; } }
+          .status { font-weight: 700; color: #176b62; }
+          @media (max-width: 760px) { .report-shell { margin: 0; border-radius: 0; } .cover, .kpi-grid { grid-template-columns: 1fr; } }
+          @media print { body { background: #fff; } .report-shell { margin: 0; border: 0; box-shadow: none; } .cover { padding: 18px 0; } .report-body { padding: 0; } }
         </style>
       </head>
       <body>
         <main class="report-shell">
-        <section class="cover">
-          <p class="meta">Relatório formal de aceite</p>
-          <h1>${escapeHtml(state.project.name)}</h1>
-          <p class="meta">Cliente/unidade: ${escapeHtml(state.project.client || "Não informado")}</p>
-          <p class="meta">Ambiente: ${escapeHtml(state.project.environment || "Não informado")}</p>
-          <p class="meta">Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}</p>
-        </section>
-        <h2>Resumo executivo</h2>
+          <section class="cover">
+            <div>
+              <p class="meta">Relatório formal de aceite</p>
+              <h1>${escapeHtml(state.project.name)}</h1>
+              <p class="meta">Cliente/unidade: ${escapeHtml(state.project.client || "Não informado")}</p>
+              <p class="meta">Ambiente: ${escapeHtml(state.project.environment || "Não informado")}</p>
+              <p class="meta">Atualizado em: ${new Date(state.updatedAt).toLocaleString("pt-BR")}</p>
+            </div>
+            <aside class="cover-card">
+              <span class="meta">Pacote Lubit</span>
+              <strong>${percent(completed, all.length)}%</strong>
+              <span class="meta">concluído para sign-off</span>
+            </aside>
+          </section>
+        <div class="report-body">
+        <h2><span class="title-icon">${renderIcon("shield")}</span>Resumo executivo</h2>
         <div class="kpi-grid">
-          <article class="kpi"><strong>${all.length}</strong><span>Cenários</span></article>
-          <article class="kpi"><strong>${percent(completed, all.length)}%</strong><span>Conclusão</span></article>
-          <article class="kpi"><strong>${issues.length}</strong><span>Pendências</span></article>
-          <article class="kpi"><strong>${state.signatures.length}</strong><span>Assinaturas</span></article>
+          <article class="kpi"><span class="kpi-icon">${renderIcon("file")}</span><div><strong>${all.length}</strong><span>Cenários</span></div></article>
+          <article class="kpi"><span class="kpi-icon">${renderIcon("check")}</span><div><strong>${percent(completed, all.length)}%</strong><span>Conclusão</span></div></article>
+          <article class="kpi"><span class="kpi-icon">${renderIcon("alert")}</span><div><strong>${issues.length}</strong><span>Pendências</span></div></article>
+          <article class="kpi"><span class="kpi-icon">${renderIcon("signature")}</span><div><strong>${state.signatures.length}</strong><span>Assinaturas</span></div></article>
         </div>
         <table>
           <tr><th>Cenários</th><th>Conclusão</th><th>Pendências</th><th>Assinaturas</th></tr>
           <tr><td>${all.length}</td><td>${percent(completed, all.length)}%</td><td>${issues.length}</td><td>${state.signatures.length}</td></tr>
         </table>
-        <h2>Fases do aceite</h2>
+        <h2><span class="title-icon">${renderIcon("check")}</span>Fases do aceite</h2>
         <table>
           <thead><tr><th>Fase</th><th>Objetivo</th></tr></thead>
           <tbody>
@@ -1890,7 +1911,7 @@ function generateReport() {
               .join("")}
           </tbody>
         </table>
-        <h2>Gates de aceite</h2>
+        <h2><span class="title-icon">${renderIcon("timer")}</span>Gates de aceite</h2>
         <table>
           <thead><tr><th>Gate</th><th>Título</th><th>Fase</th><th>Conclusão</th><th>Objetivo</th></tr></thead>
           <tbody>
@@ -1904,7 +1925,7 @@ function generateReport() {
               .join("")}
           </tbody>
         </table>
-        <h2>Matriz de aprovação</h2>
+        <h2><span class="title-icon">${renderIcon("boxes")}</span>Matriz de aprovação</h2>
         <table>
           <thead>
             <tr><th>Gate</th><th>Macroprocesso</th><th>Funcionalidade</th><th>Cenário</th><th>Tipo</th><th>Criticidade</th><th>Responsável sugerido</th><th>Status</th></tr>
@@ -1923,7 +1944,7 @@ function generateReport() {
               .join("")}
           </tbody>
         </table>
-        <h2>Roteiro UAT e evidências</h2>
+        <h2><span class="title-icon">${renderIcon("file")}</span>Roteiro UAT e evidências</h2>
         ${catalog
           .map(
             (process) => `
@@ -1959,7 +1980,7 @@ function generateReport() {
             `
           )
           .join("")}
-        <h2>Pendências abertas</h2>
+        <h2><span class="title-icon">${renderIcon("alert")}</span>Pendências abertas</h2>
         ${
           issues.length
             ? `<table><thead><tr><th>Severidade</th><th>Status</th><th>Cenário</th><th>Responsável</th><th>Pendência</th></tr></thead><tbody>${issues
@@ -1972,7 +1993,7 @@ function generateReport() {
                 .join("")}</tbody></table>`
             : "<p>Nenhuma pendência aberta.</p>"
         }
-        <h2>Assinaturas</h2>
+        <h2><span class="title-icon">${renderIcon("signature")}</span>Assinaturas</h2>
         ${
           state.signatures.length
             ? `<table><thead><tr><th>Área</th><th>Nome</th><th>Cargo</th><th>Data</th><th>Observações</th></tr></thead><tbody>${state.signatures
@@ -1985,6 +2006,7 @@ function generateReport() {
                 .join("")}</tbody></table>`
             : "<p>Nenhuma assinatura registrada.</p>"
         }
+        </div>
         </main>
       </body>
     </html>
